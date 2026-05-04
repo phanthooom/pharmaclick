@@ -26,7 +26,7 @@ export default function BottomNav() {
       bottom: 0,
       left: 0,
       right: 0,
-      height: 'var(--nav-height)',
+      height: 'calc(var(--nav-height) + var(--tg-safe-bottom))',
       background: 'var(--neutral-0)',
       borderTop: '1px solid var(--neutral-100)',
       display: 'flex',

@@ -7,6 +7,20 @@
     <meta name="theme-color" content="#00875A" />
     <title>PharmaClick</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+      // Early Telegram fullscreen bootstrap — runs synchronously after telegram-web-app.js.
+      // Prevents compact bottom-sheet flash before React mounts.
+      (function () {
+        try {
+          var wa = window.Telegram && window.Telegram.WebApp;
+          if (!wa) return;
+          if (wa.ready) wa.ready();
+          if (wa.expand) wa.expand();
+          try { if (wa.requestFullscreen) wa.requestFullscreen(); } catch (e) {}
+          if (wa.disableVerticalSwipes) wa.disableVerticalSwipes();
+        } catch (e) {}
+      })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />

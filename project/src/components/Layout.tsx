@@ -11,8 +11,8 @@ export default function Layout() {
       {!isSuccess && <Header />}
       <main style={{
         flex: 1,
-        paddingTop: isSuccess ? 0 : 'var(--header-height)',
-        paddingBottom: isSuccess ? 0 : 'var(--nav-height)',
+        paddingTop: isSuccess ? 0 : 'calc(var(--header-height) + var(--tg-header-pad))',
+        paddingBottom: isSuccess ? 0 : 'calc(var(--nav-height) + var(--tg-safe-bottom))',
         overflowX: 'hidden',
       }}>
         <Outlet />

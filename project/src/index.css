@@ -53,6 +53,10 @@
 
   --nav-height: 64px;
   --header-height: 56px;
+
+  /* Telegram safe-area vars — overwritten by JS after init */
+  --tg-header-pad: 0px;
+  --tg-safe-bottom: 0px;
 }
 
 html, body {
