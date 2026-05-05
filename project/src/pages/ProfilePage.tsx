@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { MapPin, Phone, User, CreditCard as Edit3, Save, X, ShieldCheck, Truck, Tag, UserCircle } from 'lucide-react'
+import { MapPin, Phone, User, CreditCard as Edit3, Save, X, ShieldCheck, Truck, Tag } from 'lucide-react'
 
 const PROFILE_KEY = 'pharmaclick_profile'
 
@@ -57,7 +57,7 @@ export default function ProfilePage() {
           borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
           border: '3px solid rgba(255,255,255,0.3)',
         }}>
-          <UserCircle size={40} strokeWidth={1.5} />
+          <User size={36} strokeWidth={1.5} />
         </div>
         <div>
           <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 2 }}>
@@ -110,9 +110,9 @@ export default function ProfilePage() {
         )}
 
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <ProfileRow icon={<User size={16} />} label="Имя" value={editing ? undefined : (profile.name || '—')} editing={editing} editValue={form.name} onEdit={v => setForm(f => ({ ...f, name: v }))} />
-          <ProfileRow icon={<Phone size={16} />} label="Телефон" value={editing ? undefined : (profile.phone || '—')} editing={editing} editValue={form.phone} onEdit={v => setForm(f => ({ ...f, phone: v }))} type="tel" />
-          <ProfileRow icon={<MapPin size={16} />} label="Адрес" value={editing ? undefined : (profile.address || '—')} editing={editing} editValue={form.address} onEdit={v => setForm(f => ({ ...f, address: v }))} />
+          <ProfileRow icon={<User size={16} />} label="Имя" value={editing ? undefined : (profile.name || 'не указано')} editing={editing} editValue={form.name} onEdit={v => setForm(f => ({ ...f, name: v }))} />
+          <ProfileRow icon={<Phone size={16} />} label="Телефон" value={editing ? undefined : (profile.phone || 'не указан')} editing={editing} editValue={form.phone} onEdit={v => setForm(f => ({ ...f, phone: v }))} type="tel" />
+          <ProfileRow icon={<MapPin size={16} />} label="Адрес" value={editing ? undefined : (profile.address || 'не указан')} editing={editing} editValue={form.address} onEdit={v => setForm(f => ({ ...f, address: v }))} />
         </div>
       </div>
 
@@ -123,8 +123,8 @@ export default function ProfilePage() {
             <div key={title} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
               <div style={{
                 width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                background: 'var(--green-50)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: 'var(--green-700)',
+                background: '#f0faf5', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#005738',
               }}>
                 <Icon size={18} strokeWidth={1.8} />
               </div>
