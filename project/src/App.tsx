@@ -1,7 +1,8 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { CartProvider } from './context/CartContext'
 import Layout from './components/Layout'
+import SplashScreen from './components/SplashScreen'
 import HomePage from './pages/HomePage'
 import CatalogPage from './pages/CatalogPage'
 import ProductPage from './pages/ProductPage'
@@ -25,6 +26,8 @@ function applyTgInsets(tg: any) {
 }
 
 export default function App() {
+  const [splashDone, setSplashDone] = useState(false)
+
   useEffect(() => {
     const tg = (window as any).Telegram?.WebApp
     if (!tg) return
@@ -41,6 +44,8 @@ export default function App() {
   }, [])
 
   return (
+    <>
+      {!splashDone && <SplashScreen onDone={() => setSplashDone(true)} />}
     <CartProvider>
       <BrowserRouter>
         <Routes>
@@ -57,5 +62,6 @@ export default function App() {
         </Routes>
       </BrowserRouter>
     </CartProvider>
+    </>
   )
 }
