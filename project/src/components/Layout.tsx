@@ -13,7 +13,7 @@ export default function Layout() {
         flex: 1,
         paddingTop: isSuccess ? 0 : 'calc(var(--header-height) + var(--tg-header-pad))',
         paddingBottom: isSuccess ? 0 : 'calc(var(--nav-height) + max(var(--tg-safe-bottom), env(safe-area-inset-bottom)))',
-        overflowX: 'clip',
+        overflowX: 'hidden',
       }}>
         <Outlet />
       </main>

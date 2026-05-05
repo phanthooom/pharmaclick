@@ -46,7 +46,7 @@ export default function CatalogPage() {
 
   if (!slug) {
     return (
-      <div style={{ padding: '16px 16px 24px' }}>
+      <div style={{ padding: '16px 20px 24px 16px' }}>
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(2, 1fr)',
