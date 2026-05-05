@@ -40,7 +40,7 @@ export default function Header() {
       borderBottom: '1px solid var(--neutral-100)',
       display: 'flex',
       alignItems: 'flex-end',
-      padding: '0 16px var(--header-height-pad, 8px)',
+      padding: '0 16px var(--header-height-pad, 4px)',
       paddingTop: 'var(--tg-header-pad)',
       zIndex: 100,
       gap: 8,
