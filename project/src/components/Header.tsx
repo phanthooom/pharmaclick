@@ -61,15 +61,11 @@ export default function Header() {
         </button>
       ) : (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{
-            width: 32, height: 32,
-            background: 'linear-gradient(135deg, var(--green-500), var(--teal-500))',
-            borderRadius: 10,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 16,
-          }}>
-            💊
-          </div>
+          <img
+            src="/logo.jpg"
+            alt="PharmaClick"
+            style={{ width: 36, height: 36, borderRadius: 10, objectFit: 'cover', flexShrink: 0 }}
+          />
         </div>
       )}
 
