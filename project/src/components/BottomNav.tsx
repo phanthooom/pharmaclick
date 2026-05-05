@@ -30,9 +30,8 @@ export default function BottomNav() {
       background: 'var(--neutral-0)',
       borderTop: '1px solid var(--neutral-100)',
       display: 'flex',
-      alignItems: 'stretch',
+      alignItems: 'flex-start',
       zIndex: 100,
-      paddingBottom: 'env(safe-area-inset-bottom)',
     }}>
       {TABS.map(({ path, icon: Icon, label }) => {
         const active = isActive(path)
@@ -43,6 +42,7 @@ export default function BottomNav() {
             onClick={() => navigate(path)}
             style={{
               flex: 1,
+              height: 'var(--nav-height)',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',

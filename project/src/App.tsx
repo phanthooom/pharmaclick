@@ -20,7 +20,7 @@ function applyTgInsets(tg: any) {
   const cTop = Math.max(Number(content.top ?? 0), Number(safe.top ?? 0))
   const cBottom = Math.max(Number(content.bottom ?? 0), Number(safe.bottom ?? 0))
   // Mirror croissant: always at least 72px inside Telegram for the floating close bar.
-  setCss('--tg-header-pad', `${Math.max(cTop, 72)}px`)
+  setCss('--tg-header-pad', `${Math.max(cTop, 88)}px`)
   setCss('--tg-safe-bottom', `${cBottom}px`)
 }
 
