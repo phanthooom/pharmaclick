@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { ArrowLeft, Search, ShoppingCart } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 
@@ -14,6 +14,7 @@ const PAGE_TITLES: Record<string, string> = {
 export default function Header() {
   const location = useLocation()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { itemCount } = useCart()
 
   const isHome = location.pathname === '/'
@@ -92,24 +93,39 @@ export default function Header() {
       )}
 
       {showSearch ? (
-        <button
-          onClick={() => navigate('/catalog')}
-          style={{
-            flex: 1,
-            display: 'flex', alignItems: 'center', gap: 8,
-            height: 38,
-            background: 'var(--neutral-100)',
-            borderRadius: 'var(--radius-full)',
-            padding: '0 14px',
-            color: 'var(--neutral-400)',
-            fontSize: 14,
-            textAlign: 'left',
-            border: 'none',
-          }}
-        >
-          <Search size={16} />
-          <span>Поиск...</span>
-        </button>
+        <div style={{ flex: 1, position: 'relative' }}>
+          <div style={{
+            position: 'absolute', left: 14, top: 0, bottom: 0,
+            display: 'flex', alignItems: 'center', color: 'var(--neutral-400)'
+          }}>
+            <Search size={16} />
+          </div>
+          <input
+            type="text"
+            placeholder="Поиск товаров..."
+            value={searchParams.get('q') || ''}
+            onChange={(e) => {
+              const val = e.target.value
+              if (location.pathname !== '/catalog') {
+                navigate(`/catalog?q=${encodeURIComponent(val)}`)
+              } else {
+                navigate(`/catalog?q=${encodeURIComponent(val)}`, { replace: true })
+              }
+            }}
+            style={{
+              width: '100%',
+              height: 38,
+              background: 'var(--neutral-100)',
+              borderRadius: 'var(--radius-full)',
+              padding: '0 14px 0 38px',
+              color: 'var(--neutral-900)',
+              fontSize: 14,
+              border: 'none',
+              outline: 'none',
+              WebkitAppearance: 'none',
+            }}
+          />
+        </div>
       ) : (
         <span style={{
           flex: 1,

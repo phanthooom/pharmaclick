@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
 import { supabase, Product, Category } from '../lib/supabase'
 import ProductCard from '../components/ProductCard'
@@ -8,6 +8,8 @@ import CategoryIcon from '../components/CategoryIcon'
 export default function CatalogPage() {
   const { slug } = useParams<{ slug?: string }>()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const q = searchParams.get('q') || ''
 
   const [categories, setCategories] = useState<Category[]>([])
   const [products, setProducts] = useState<Product[]>([])
@@ -20,7 +22,15 @@ export default function CatalogPage() {
       const { data: cats } = await supabase.from('categories').select('*').order('sort_order')
       setCategories((cats as Category[]) ?? [])
 
-      if (slug) {
+      if (q) {
+        setCurrentCategory(null)
+        const { data: prods } = await supabase
+          .from('products')
+          .select('*, category:categories(name), brand:brands(name)')
+          .ilike('name', `%${q}%`)
+          .limit(50)
+        setProducts((prods as Product[]) ?? [])
+      } else if (slug) {
         const cat = (cats as Category[])?.find(c => c.slug === slug) ?? null
         setCurrentCategory(cat)
         if (cat) {
@@ -41,11 +51,11 @@ export default function CatalogPage() {
       setLoading(false)
     }
     load()
-  }, [slug])
+  }, [slug, q])
 
   if (loading) return <CatalogSkeleton />
 
-  if (!slug) {
+  if (!slug && !q) {
     return (
       <div style={{ padding: '16px' }}>
         <div style={{
@@ -120,6 +130,23 @@ export default function CatalogPage() {
               {products.length} товаров
             </p>
           </div>
+        </div>
+      )}
+
+      {q && (
+        <div style={{
+          background: 'var(--neutral-0)',
+          borderRadius: 'var(--radius-lg)',
+          padding: '14px 16px',
+          marginBottom: 16,
+          boxShadow: 'var(--shadow-sm)',
+        }}>
+          <h2 style={{ fontSize: 17, fontWeight: 700, color: 'var(--neutral-900)' }}>
+            Результаты поиска
+          </h2>
+          <p style={{ fontSize: 13, color: 'var(--neutral-400)', marginTop: 2 }}>
+            По запросу "{q}" найдено {products.length} товаров
+          </p>
         </div>
       )}
 
