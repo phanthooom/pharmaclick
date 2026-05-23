@@ -34,45 +34,56 @@ export function CartProvider({ children }: { children: ReactNode }) {
     fetchCart()
   }, [fetchCart])
 
-  const addItem = async (productId: string) => {
-    const existing = items.find(i => i.product_id === productId)
+  const addItem = async (product: Product) => {
+    const existing = items.find(i => i.product_id === product.id)
     if (existing) {
-      await updateQuantity(productId, existing.quantity + 1)
+      updateQuantity(product.id, existing.quantity + 1)
     } else {
-      await supabase.from('cart_items').insert({
+      const newItem = {
+        id: crypto.randomUUID(),
         session_id: sessionId,
-        product_id: productId,
+        product_id: product.id,
         quantity: 1,
-      })
-      await fetchCart()
+        created_at: new Date().toISOString(),
+        product: product
+      }
+      setItems(prev => [...prev, newItem])
+      
+      supabase.from('cart_items').insert({
+        session_id: sessionId,
+        product_id: product.id,
+        quantity: 1,
+      }).then(() => fetchCart())
     }
   }
 
   const removeItem = async (productId: string) => {
-    await supabase
+    setItems(prev => prev.filter(i => i.product_id !== productId))
+    supabase
       .from('cart_items')
       .delete()
       .eq('session_id', sessionId)
       .eq('product_id', productId)
-    await fetchCart()
+      .then(() => fetchCart())
   }
 
   const updateQuantity = async (productId: string, quantity: number) => {
     if (quantity <= 0) {
-      await removeItem(productId)
+      removeItem(productId)
       return
     }
-    await supabase
+    setItems(prev => prev.map(i => i.product_id === productId ? { ...i, quantity } : i))
+    supabase
       .from('cart_items')
       .update({ quantity })
       .eq('session_id', sessionId)
       .eq('product_id', productId)
-    await fetchCart()
+      .then(() => fetchCart())
   }
 
   const clearCart = async () => {
-    await supabase.from('cart_items').delete().eq('session_id', sessionId)
     setItems([])
+    supabase.from('cart_items').delete().eq('session_id', sessionId)
   }
 
   const getQuantity = (productId: string) =>

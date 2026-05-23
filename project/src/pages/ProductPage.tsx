@@ -42,7 +42,7 @@ export default function ProductPage() {
 
   const handleAdd = async () => {
     setAdding(true)
-    await addItem(product.id)
+    await addItem(product)
     setAdding(false)
   }
 

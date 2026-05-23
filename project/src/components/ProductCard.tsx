@@ -18,7 +18,7 @@ export default function ProductCard({ product, compact = false }: Props) {
 
   const handleAdd = async (e: React.MouseEvent) => {
     e.stopPropagation()
-    await addItem(product.id)
+    await addItem(product)
   }
 
   const handleDecrease = async (e: React.MouseEvent) => {
