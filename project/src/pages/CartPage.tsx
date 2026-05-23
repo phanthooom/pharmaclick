@@ -34,7 +34,7 @@ export default function CartPage() {
     setSubmitting(true)
     const sessionId = getSessionId()
 
-    const { data: order } = await supabase
+    const { data: order, error } = await supabase
       .from('orders')
       .insert({
         session_id: sessionId,
@@ -48,6 +48,11 @@ export default function CartPage() {
       })
       .select()
       .single()
+
+    if (error) {
+      console.error('Order creation error:', error)
+      alert(`Ошибка при оформлении заказа: ${error.message}`)
+    }
 
     if (order) {
       const orderItems = items.map(item => ({
