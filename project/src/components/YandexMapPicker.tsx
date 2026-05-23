@@ -60,15 +60,35 @@ export default function YandexMapPicker({
   const geocode = useCallback(async (lat: number, lon: number) => {
     setGeocoding(true)
     try {
+      // 1. Попытка через встроенный JS API Яндекса
       const res = await (window.ymaps as any).geocode([lat, lon], { results: 1 })
       const first = (res as any).geoObjects.get(0)
       const text: string = first?.getAddressLine?.() ?? ''
-      setAddress(text || `${lat.toFixed(5)}, ${lon.toFixed(5)}`)
-    } catch {
-      setAddress(`${lat.toFixed(5)}, ${lon.toFixed(5)}`)
-    } finally {
-      setGeocoding(false)
+      if (text) {
+        setAddress(text)
+        setGeocoding(false)
+        return
+      }
+    } catch (e) {
+      console.warn('JS API Geocode failed, trying fallback...', e)
     }
+
+    try {
+      // 2. Fallback на OSM Nominatim (полностью бесплатный и работает без ключей)
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=ru`)
+      const data = await res.json()
+      if (data && data.display_name) {
+        setAddress(data.display_name)
+        setGeocoding(false)
+        return
+      }
+    } catch (e) {
+      console.warn('OSM Geocode failed', e)
+    }
+
+    // Если всё сломалось, показываем координаты
+    setAddress(`${lat.toFixed(5)}, ${lon.toFixed(5)}`)
+    setGeocoding(false)
   }, [])
 
   function panTo(lat: number, lon: number) {
@@ -122,7 +142,7 @@ export default function YandexMapPicker({
           if (timerRef.current) clearTimeout(timerRef.current)
           const [lat, lon]: [number, number] = map.getCenter()
           setCoords({ lat, lon })
-          timerRef.current = setTimeout(() => void geocode(lat, lon), 350)
+          timerRef.current = setTimeout(() => void geocode(lat, lon), 800)
         })
       })
       .catch(() => {
