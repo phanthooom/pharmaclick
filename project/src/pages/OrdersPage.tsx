@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronRight, Package, Clock, CircleCheck as CheckCircle2 } from 'lucide-react'
+import { ChevronRight, Package, Clock, CircleCheck as CheckCircle2, X, MapPin } from 'lucide-react'
 import { supabase, Order } from '../lib/supabase'
 import { getSessionId } from '../lib/session'
 import { formatPrice } from '../lib/format'
@@ -9,6 +9,7 @@ export default function OrdersPage() {
   const navigate = useNavigate()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
 
   useEffect(() => {
     async function load() {
@@ -29,11 +30,11 @@ export default function OrdersPage() {
   if (orders.length === 0) return <EmptyOrders />
 
   return (
-    <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+    <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 12, paddingBottom: 32 }}>
       {orders.map(order => (
         <div
           key={order.id}
-          onClick={() => navigate(`/orders?detail=${order.id}`)}
+          onClick={() => setSelectedOrder(order)}
           style={{
             background: 'var(--neutral-0)',
             borderRadius: 'var(--radius-lg)',
@@ -65,7 +66,165 @@ export default function OrdersPage() {
           </div>
         </div>
       ))}
+
+      {/* Bottom Sheet */}
+      <OrderBottomSheet order={selectedOrder} onClose={() => setSelectedOrder(null)} />
+
+      <style>{`
+        @keyframes slideUp {
+          from { transform: translateY(100%); }
+          to { transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+      `}</style>
     </div>
+  )
+}
+
+function OrderBottomSheet({ order, onClose }: { order: Order | null, onClose: () => void }) {
+  const [items, setItems] = useState<any[]>([])
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (!order) return
+    setLoading(true)
+    supabase
+      .from('order_items')
+      .select('*, product:products(*)')
+      .eq('order_id', order.id)
+      .then(({ data }) => {
+        setItems(data || [])
+        setLoading(false)
+      })
+  }, [order])
+
+  if (!order) return null
+
+  return (
+    <>
+      <div 
+        onClick={onClose}
+        style={{
+          position: 'fixed', inset: 0, zIndex: 200,
+          background: 'rgba(0,0,0,0.5)',
+          animation: 'fadeIn 0.2s ease',
+        }} 
+      />
+      <div style={{
+        position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 201,
+        background: 'var(--neutral-50)',
+        borderRadius: '24px 24px 0 0',
+        maxHeight: '90vh',
+        display: 'flex', flexDirection: 'column',
+        animation: 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+        paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)'
+      }}>
+        {/* Header */}
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '20px 20px 16px', background: '#fff', borderRadius: '24px 24px 0 0',
+          borderBottom: '1px solid var(--neutral-100)',
+          position: 'sticky', top: 0, zIndex: 10,
+        }}>
+          <div>
+            <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--neutral-900)', marginBottom: 4 }}>
+              Заказ #{order.id.slice(0, 8).toUpperCase()}
+            </h3>
+            <p style={{ fontSize: 13, color: 'var(--neutral-400)' }}>
+              {new Date(order.created_at).toLocaleDateString('ru-RU', {
+                day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit',
+              })}
+            </p>
+          </div>
+          <button 
+            onClick={onClose}
+            style={{
+              width: 36, height: 36, borderRadius: '50%', background: 'var(--neutral-100)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--neutral-600)',
+            }}
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Scrollable Content */}
+        <div style={{ overflowY: 'auto', padding: '16px', flex: 1 }} className="hide-scrollbar">
+          
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+            <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--neutral-800)' }}>Статус</span>
+            <StatusBadge status={order.status} />
+          </div>
+
+          <div style={{
+            background: '#fff', borderRadius: 'var(--radius-lg)', padding: '16px',
+            marginBottom: 16, display: 'flex', gap: 12, alignItems: 'flex-start'
+          }}>
+            <div style={{
+              width: 32, height: 32, borderRadius: '50%', background: 'var(--green-50)', color: 'var(--green-600)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
+            }}>
+              <MapPin size={16} />
+            </div>
+            <div>
+              <p style={{ fontSize: 13, color: 'var(--neutral-400)', marginBottom: 2 }}>Адрес доставки</p>
+              <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--neutral-800)', lineHeight: 1.4 }}>
+                {order.customer_address}
+              </p>
+            </div>
+          </div>
+
+          <h4 style={{ fontSize: 15, fontWeight: 700, color: 'var(--neutral-900)', marginBottom: 12, paddingLeft: 4 }}>
+            Товары ({items.length})
+          </h4>
+          
+          {loading ? (
+            <div style={{ display: 'flex', justifyContent: 'center', padding: 20 }}>
+              <div style={{ width: 24, height: 24, borderRadius: '50%', border: '3px solid var(--green-100)', borderTopColor: 'var(--green-500)', animation: 'spin 1s linear infinite' }} />
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {items.map(item => (
+                <div key={item.id} style={{
+                  background: '#fff', borderRadius: 'var(--radius-lg)', padding: '12px',
+                  display: 'flex', gap: 12, alignItems: 'center'
+                }}>
+                  <img 
+                    src={item.product?.image_url || 'https://images.pexels.com/photos/3997379/pexels-photo-3997379.jpeg?auto=compress&cs=tinysrgb&w=200'} 
+                    alt={item.product?.name}
+                    style={{ width: 56, height: 56, borderRadius: 'var(--radius-md)', objectFit: 'cover', background: 'var(--neutral-100)' }}
+                  />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--neutral-800)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: 4 }}>
+                      {item.product?.name}
+                    </p>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: 13, color: 'var(--neutral-500)' }}>{item.quantity} шт.</span>
+                      <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--green-600)' }}>
+                        {formatPrice(item.price)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div style={{
+            background: '#fff', borderRadius: 'var(--radius-lg)', padding: '16px',
+            marginTop: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+          }}>
+            <span style={{ fontSize: 16, fontWeight: 600, color: 'var(--neutral-800)' }}>Итого</span>
+            <span style={{ fontSize: 18, fontWeight: 800, color: 'var(--neutral-900)' }}>
+              {formatPrice(order.total_amount)}
+            </span>
+          </div>
+
+        </div>
+      </div>
+    </>
   )
 }
 
