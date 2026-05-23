@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { CircleCheck as CheckCircle, Chrome as Home, Package } from 'lucide-react'
+import { CircleCheck as CheckCircle, Home, Package, PhoneCall, Box, Truck } from 'lucide-react'
 
 export default function OrderSuccessPage() {
   const navigate = useNavigate()
@@ -97,9 +97,9 @@ export default function OrderSuccessPage() {
         transition: 'all 0.5s ease 0.35s',
       }}>
         {[
-          { icon: '📞', title: 'Звонок оператора', desc: 'В течение 15 минут' },
-          { icon: '📦', title: 'Сборка заказа', desc: 'Оригинальные препараты' },
-          { icon: '🚀', title: 'Доставка', desc: 'До вашей двери' },
+          { icon: <PhoneCall size={20} color="var(--green-600)" />, title: 'Звонок оператора', desc: 'В течение 15 минут' },
+          { icon: <Box size={20} color="var(--green-600)" />, title: 'Сборка заказа', desc: 'Оригинальные препараты' },
+          { icon: <Truck size={20} color="var(--green-600)" />, title: 'Доставка', desc: 'До вашей двери' },
         ].map((step, i) => (
           <div key={i} style={{
             display: 'flex', gap: 14, alignItems: 'flex-start',
