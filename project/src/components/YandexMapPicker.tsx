@@ -177,25 +177,10 @@ export default function YandexMapPicker({
         pointerEvents: 'none'
       }}>
         
-        {/* Top Bar (Back Button + Address Bubble) */}
+        {/* Top Bar (Address Bubble Only) */}
         <div style={{
           display: 'flex', width: '100%', alignItems: 'flex-start', gap: 12, pointerEvents: 'auto'
         }}>
-          {/* Back Button */}
-          <button
-            type="button"
-            onClick={onClose}
-            style={{
-              width: 40, height: 40, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              borderRadius: '50%', background: '#fff', color: 'var(--neutral-900)',
-              boxShadow: '0 2px 12px rgba(0,0,0,0.15)', border: 'none'
-            }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-
           {/* Address Bubble */}
           <div style={{
             flex: 1, borderRadius: 16, background: '#fff', padding: '10px 16px',
