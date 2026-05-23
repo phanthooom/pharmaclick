@@ -252,7 +252,13 @@ export default function CartPage() {
             icon={<Phone size={16} />}
             placeholder="+998 90 123 45 67"
             value={form.phone}
-            onChange={v => setForm(f => ({ ...f, phone: v }))}
+            onChange={v => {
+              if (v.length < 5 || !v.startsWith('+998 ')) {
+                setForm(f => ({ ...f, phone: '+998 ' }))
+              } else {
+                setForm(f => ({ ...f, phone: v }))
+              }
+            }}
             type="tel"
             error={errors.phone}
           />

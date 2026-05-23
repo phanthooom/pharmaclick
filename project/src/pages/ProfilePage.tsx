@@ -123,7 +123,21 @@ export default function ProfilePage() {
 
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <ProfileRow icon={<User size={16} />} label="Имя" value={editing ? undefined : (profile.name || 'не указано')} editing={editing} editValue={form.name} onEdit={v => setForm(f => ({ ...f, name: v }))} />
-          <ProfileRow icon={<Phone size={16} />} label="Телефон" value={editing ? undefined : (profile.phone || 'не указан')} editing={editing} editValue={form.phone} onEdit={v => setForm(f => ({ ...f, phone: v }))} type="tel" />
+          <ProfileRow 
+            icon={<Phone size={16} />} 
+            label="Телефон" 
+            value={editing ? undefined : (profile.phone || 'не указан')} 
+            editing={editing} 
+            editValue={form.phone || '+998 '} 
+            onEdit={v => {
+              if (v.length < 5 || !v.startsWith('+998 ')) {
+                setForm(f => ({ ...f, phone: '+998 ' }))
+              } else {
+                setForm(f => ({ ...f, phone: v }))
+              }
+            }} 
+            type="tel" 
+          />
           <ProfileRow 
             icon={<MapPin size={16} />} 
             label="Адрес" 
