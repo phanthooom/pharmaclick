@@ -49,6 +49,8 @@ export default function Header() {
     }
   }, [showBack, navigate])
 
+  const isTg = !!(window as any).Telegram?.WebApp?.initData
+
   return (
     <header style={{
       position: 'fixed',
@@ -65,7 +67,7 @@ export default function Header() {
       zIndex: 100,
       gap: 8,
     }}>
-      {showBack ? (
+      {(showBack && !isTg) ? (
         <button
           onClick={() => navigate(-1)}
           style={{
