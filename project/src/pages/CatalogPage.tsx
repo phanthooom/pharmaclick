@@ -70,7 +70,7 @@ export default function CatalogPage() {
               }}
             >
               <div style={{ color: 'var(--green-500)', flexShrink: 0, paddingRight: 4 }}>
-                <CategoryIcon slug={cat.slug} size={28} />
+                <CategoryIcon slug={cat.slug} name={cat.name} size={28} />
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ 
@@ -110,7 +110,7 @@ export default function CatalogPage() {
           boxShadow: 'var(--shadow-sm)',
         }}>
           <div style={{ color: 'var(--green-500)' }}>
-            <CategoryIcon slug={currentCategory.slug} size={36} />
+            <CategoryIcon slug={currentCategory.slug} name={currentCategory.name} size={36} />
           </div>
           <div>
             <h2 style={{ fontSize: 17, fontWeight: 700, color: 'var(--neutral-900)' }}>
@@ -148,14 +148,14 @@ export default function CatalogPage() {
               display: 'flex', alignItems: 'center', gap: 6,
             }}
           >
-            <CategoryIcon slug={cat.slug} size={14} />
+            <CategoryIcon slug={cat.slug} name={cat.name} size={14} />
             {cat.name}
           </button>
         ))}
       </div>
 
       {products.length === 0 ? (
-        <EmptyState categorySlug={currentCategory?.slug} />
+        <EmptyState categorySlug={currentCategory?.slug} categoryName={currentCategory?.name} />
       ) : (
         <div style={{
           display: 'grid',
@@ -171,7 +171,7 @@ export default function CatalogPage() {
   )
 }
 
-function EmptyState({ categorySlug }: { categorySlug?: string }) {
+function EmptyState({ categorySlug, categoryName }: { categorySlug?: string, categoryName?: string }) {
   return (
     <div style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center',
@@ -179,7 +179,7 @@ function EmptyState({ categorySlug }: { categorySlug?: string }) {
     }}>
       <div style={{ color: 'var(--neutral-300)' }}>
         {categorySlug ? (
-          <CategoryIcon slug={categorySlug} size={48} />
+          <CategoryIcon slug={categorySlug} name={categoryName} size={48} />
         ) : (
           <span style={{ fontSize: 48 }}>📦</span>
         )}

@@ -171,7 +171,7 @@ export default function HomePage() {
               }}
             >
               <div style={{ color: 'var(--green-500)' }}>
-                <CategoryIcon slug={cat.slug} size={26} />
+                <CategoryIcon slug={cat.slug} name={cat.name} size={26} />
               </div>
               <span style={{
                 fontSize: 11,
