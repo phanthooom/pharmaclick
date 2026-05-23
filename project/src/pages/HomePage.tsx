@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronRight, Zap, Shield, Clock } from 'lucide-react'
+import { ChevronRight, Zap, Shield, Clock, Search } from 'lucide-react'
 import { supabase, Product, Category } from '../lib/supabase'
 import ProductCard from '../components/ProductCard'
 import CategoryIcon from '../components/CategoryIcon'
@@ -99,6 +99,28 @@ export default function HomePage() {
             Смотреть каталог
             <ChevronRight size={16} />
           </button>
+        </div>
+      </div>
+
+      {/* Fake Search Bar */}
+      <div style={{ padding: '16px 16px 0' }}>
+        <div 
+          onClick={() => navigate('/search')}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 10,
+            background: 'var(--neutral-0)',
+            border: '1.5px solid var(--neutral-200)',
+            borderRadius: 'var(--radius-lg)',
+            padding: '0 14px',
+            height: 48,
+            boxShadow: 'var(--shadow-sm)',
+            cursor: 'text',
+          }}
+        >
+          <Search size={18} color="var(--neutral-400)" />
+          <span style={{ fontSize: 15, color: 'var(--neutral-400)', flex: 1 }}>
+            Поиск лекарств, витаминов...
+          </span>
         </div>
       </div>
 
