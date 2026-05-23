@@ -84,12 +84,22 @@ export default function OrdersPage() {
   )
 }
 
+import { useRef } from 'react'
+
 function OrderBottomSheet({ order, onClose }: { order: Order | null, onClose: () => void }) {
   const [items, setItems] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
+  const sheetRef = useRef<HTMLDivElement>(null)
+  const isDragging = useRef(false)
+  const startY = useRef(0)
 
   useEffect(() => {
     if (!order) return
+    // Reset transform when opened
+    if (sheetRef.current) {
+      sheetRef.current.style.transition = 'none'
+      sheetRef.current.style.transform = 'translateY(0)'
+    }
     setLoading(true)
     supabase
       .from('order_items')
@@ -101,53 +111,105 @@ function OrderBottomSheet({ order, onClose }: { order: Order | null, onClose: ()
       })
   }, [order])
 
+  const handleClose = () => {
+    if (sheetRef.current) {
+      sheetRef.current.style.transition = 'transform 0.25s cubic-bezier(0.3, 1, 0.3, 1)'
+      sheetRef.current.style.transform = `translateY(100%)`
+    }
+    setTimeout(onClose, 250)
+  }
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    startY.current = e.touches[0].clientY
+    isDragging.current = true
+    if (sheetRef.current) {
+      sheetRef.current.style.transition = 'none'
+    }
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging.current || !sheetRef.current) return
+    const delta = Math.max(0, e.touches[0].clientY - startY.current)
+    sheetRef.current.style.transform = `translateY(${delta}px)`
+  }
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!isDragging.current || !sheetRef.current) return
+    isDragging.current = false
+    const currentY = e.changedTouches[0].clientY
+    const delta = currentY - startY.current
+    
+    sheetRef.current.style.transition = 'transform 0.25s cubic-bezier(0.3, 1, 0.3, 1)'
+    if (delta > 100) {
+      handleClose()
+    } else {
+      sheetRef.current.style.transform = 'translateY(0)'
+    }
+  }
+
   if (!order) return null
 
   return (
     <>
       <div 
-        onClick={onClose}
+        onClick={handleClose}
         style={{
           position: 'fixed', inset: 0, zIndex: 200,
           background: 'rgba(0,0,0,0.5)',
           animation: 'fadeIn 0.2s ease',
         }} 
       />
-      <div style={{
-        position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 201,
-        background: 'var(--neutral-50)',
-        borderRadius: '24px 24px 0 0',
-        maxHeight: '90vh',
-        display: 'flex', flexDirection: 'column',
-        animation: 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-        paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)'
-      }}>
-        {/* Header */}
-        <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '20px 20px 16px', background: '#fff', borderRadius: '24px 24px 0 0',
-          borderBottom: '1px solid var(--neutral-100)',
-          position: 'sticky', top: 0, zIndex: 10,
-        }}>
-          <div>
-            <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--neutral-900)', marginBottom: 4 }}>
-              Заказ #{order.id.slice(0, 8).toUpperCase()}
-            </h3>
-            <p style={{ fontSize: 13, color: 'var(--neutral-400)' }}>
-              {new Date(order.created_at).toLocaleDateString('ru-RU', {
-                day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit',
-              })}
-            </p>
+      <div 
+        ref={sheetRef}
+        style={{
+          position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 201,
+          background: 'var(--neutral-50)',
+          borderRadius: '24px 24px 0 0',
+          maxHeight: '90vh',
+          display: 'flex', flexDirection: 'column',
+          animation: 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+          paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)'
+        }}
+      >
+        {/* Header with Drag Handle */}
+        <div 
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          style={{
+            display: 'flex', flexDirection: 'column',
+            padding: '12px 20px 16px', background: '#fff', borderRadius: '24px 24px 0 0',
+            borderBottom: '1px solid var(--neutral-100)',
+            position: 'sticky', top: 0, zIndex: 10,
+          }}
+        >
+          {/* Drag Pill */}
+          <div style={{
+            width: 40, height: 4, background: 'var(--neutral-200)', borderRadius: 2,
+            margin: '0 auto 16px'
+          }} />
+          
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div>
+              <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--neutral-900)', marginBottom: 4 }}>
+                Заказ #{order.id.slice(0, 8).toUpperCase()}
+              </h3>
+              <p style={{ fontSize: 13, color: 'var(--neutral-400)' }}>
+                {new Date(order.created_at).toLocaleDateString('ru-RU', {
+                  day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit',
+                })}
+              </p>
+            </div>
+            <button 
+              onClick={handleClose}
+              style={{
+                width: 36, height: 36, borderRadius: '50%', background: 'var(--neutral-100)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--neutral-600)',
+              }}
+            >
+              <X size={20} />
+            </button>
           </div>
-          <button 
-            onClick={onClose}
-            style={{
-              width: 36, height: 36, borderRadius: '50%', background: 'var(--neutral-100)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--neutral-600)',
-            }}
-          >
-            <X size={20} />
-          </button>
         </div>
 
         {/* Scrollable Content */}
