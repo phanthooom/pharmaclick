@@ -162,24 +162,22 @@ export default function HomePage() {
               style={{
                 flexShrink: 0,
                 display: 'flex', flexDirection: 'column', alignItems: 'center',
-                gap: 6, padding: '12px 10px',
+                gap: 8, padding: '12px 16px',
                 background: 'var(--neutral-0)',
                 borderRadius: 'var(--radius-lg)',
                 boxShadow: 'var(--shadow-sm)',
-                minWidth: 70,
-                transition: 'transform 0.15s ease',
+                minWidth: 76,
               }}
             >
               <div style={{ color: 'var(--green-500)' }}>
-                <CategoryIcon slug={cat.slug} name={cat.name} size={26} />
+                <CategoryIcon slug={cat.slug} name={cat.name} size={28} />
               </div>
               <span style={{
-                fontSize: 11,
-                fontWeight: 500,
-                color: 'var(--neutral-700)',
-                textAlign: 'center',
-                lineHeight: 1.3,
-                maxWidth: 60,
+                fontSize: 12,
+                fontWeight: 600,
+                color: 'var(--neutral-800)',
+                whiteSpace: 'nowrap',
+                letterSpacing: '-0.2px',
               }}>
                 {cat.name}
               </span>
