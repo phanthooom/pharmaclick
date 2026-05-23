@@ -155,7 +155,7 @@ export default function CatalogPage() {
       </div>
 
       {products.length === 0 ? (
-        <EmptyState />
+        <EmptyState categorySlug={currentCategory?.slug} />
       ) : (
         <div style={{
           display: 'grid',
@@ -171,13 +171,19 @@ export default function CatalogPage() {
   )
 }
 
-function EmptyState() {
+function EmptyState({ categorySlug }: { categorySlug?: string }) {
   return (
     <div style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center',
       padding: '60px 20px', gap: 12, textAlign: 'center',
     }}>
-      <span style={{ fontSize: 48 }}>📦</span>
+      <div style={{ color: 'var(--neutral-300)' }}>
+        {categorySlug ? (
+          <CategoryIcon slug={categorySlug} size={48} />
+        ) : (
+          <span style={{ fontSize: 48 }}>📦</span>
+        )}
+      </div>
       <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--neutral-700)' }}>
         Товары не найдены
       </p>
