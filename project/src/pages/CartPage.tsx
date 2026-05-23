@@ -13,7 +13,7 @@ export default function CartPage() {
 
   const [checkingOut, setCheckingOut] = useState(false)
   const [submitting, setSubmitting] = useState(false)
-  const [form, setForm] = useState({ name: '', phone: '', address: '' })
+  const [form, setForm] = useState({ name: '', phone: '+998 ', address: '' })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [showMap, setShowMap] = useState(false)
   const [coords, setCoords] = useState<{lat: number, lon: number} | undefined>()
