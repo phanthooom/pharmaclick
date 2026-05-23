@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Search, ShoppingCart } from 'lucide-react'
 import { useCart } from '../context/CartContext'
@@ -28,6 +29,25 @@ export default function Header() {
   const showBack = isProduct || isCatalogChild || location.pathname === '/cart' || location.pathname === '/orders' || location.pathname === '/profile'
 
   const showSearch = location.pathname === '/' || location.pathname === '/catalog' || location.pathname.startsWith('/catalog/')
+
+  useEffect(() => {
+    const tg = (window as any).Telegram?.WebApp
+    if (!tg || !tg.BackButton) return
+
+    if (showBack) {
+      tg.BackButton.show()
+      const handleBack = () => {
+        navigate(-1)
+      }
+      tg.BackButton.onClick(handleBack)
+      return () => {
+        tg.BackButton.offClick(handleBack)
+        tg.BackButton.hide()
+      }
+    } else {
+      tg.BackButton.hide()
+    }
+  }, [showBack, navigate])
 
   return (
     <header style={{
