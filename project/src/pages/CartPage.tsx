@@ -40,6 +40,7 @@ export default function CartPage() {
   if (itemCount === 0) return <EmptyCart />
 
   const validate = () => {
+    const e: Record<string, string> = {}
     if (!form.name.trim()) e.name = 'Введите имя'
     if (!form.phone.trim()) e.phone = 'Введите номер телефона'
     if (!form.address.trim()) e.address = 'Введите адрес'
