@@ -46,7 +46,7 @@ export default function CatalogPage() {
 
   if (!slug) {
     return (
-      <div style={{ padding: '16px 20px 24px 16px' }}>
+      <div style={{ padding: '16px' }}>
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(2, 1fr)',
@@ -59,20 +59,34 @@ export default function CatalogPage() {
               style={{
                 background: 'var(--neutral-0)',
                 borderRadius: 'var(--radius-lg)',
-                padding: '16px',
-                display: 'flex', alignItems: 'center', gap: 12,
+                padding: '16px 12px',
+                display: 'flex', alignItems: 'center', gap: 8,
                 boxShadow: 'var(--shadow-sm)',
                 textAlign: 'left',
                 transition: 'transform 0.15s ease',
+                width: '100%',
+                minWidth: 0,
               }}
             >
-              <span style={{ fontSize: 28 }}>{cat.icon}</span>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--neutral-800)', lineHeight: 1.3 }}>
+              <span style={{ fontSize: 24, flexShrink: 0 }}>{cat.icon}</span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ 
+                  fontSize: 13, 
+                  fontWeight: 600, 
+                  color: 'var(--neutral-800)', 
+                  lineHeight: 1.2,
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                  wordBreak: 'break-word'
+                }}>
                   {cat.name}
                 </div>
               </div>
-              <ChevronRight size={14} color="var(--neutral-400)" />
+              <div style={{ flexShrink: 0, display: 'flex' }}>
+                <ChevronRight size={16} color="var(--neutral-400)" />
+              </div>
             </button>
           ))}
         </div>
