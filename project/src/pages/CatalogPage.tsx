@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
 import { supabase, Product, Category } from '../lib/supabase'
 import ProductCard from '../components/ProductCard'
+import CategoryIcon from '../components/CategoryIcon'
 
 export default function CatalogPage() {
   const { slug } = useParams<{ slug?: string }>()
@@ -68,7 +69,9 @@ export default function CatalogPage() {
                 minWidth: 0,
               }}
             >
-              <span style={{ fontSize: 24, flexShrink: 0 }}>{cat.icon}</span>
+              <div style={{ color: 'var(--green-500)', flexShrink: 0, paddingRight: 4 }}>
+                <CategoryIcon slug={cat.slug} size={28} />
+              </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ 
                   fontSize: 13, 
@@ -106,7 +109,9 @@ export default function CatalogPage() {
           marginBottom: 16,
           boxShadow: 'var(--shadow-sm)',
         }}>
-          <span style={{ fontSize: 32 }}>{currentCategory.icon}</span>
+          <div style={{ color: 'var(--green-500)' }}>
+            <CategoryIcon slug={currentCategory.slug} size={36} />
+          </div>
           <div>
             <h2 style={{ fontSize: 17, fontWeight: 700, color: 'var(--neutral-900)' }}>
               {currentCategory.name}
@@ -140,9 +145,11 @@ export default function CatalogPage() {
               boxShadow: 'var(--shadow-sm)',
               border: cat.slug === slug ? 'none' : '1px solid var(--neutral-200)',
               transition: 'all 0.15s ease',
+              display: 'flex', alignItems: 'center', gap: 6,
             }}
           >
-            {cat.icon} {cat.name}
+            <CategoryIcon slug={cat.slug} size={14} />
+            {cat.name}
           </button>
         ))}
       </div>

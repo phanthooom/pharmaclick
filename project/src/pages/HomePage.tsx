@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { ChevronRight, Zap, Shield, Clock } from 'lucide-react'
 import { supabase, Product, Category } from '../lib/supabase'
 import ProductCard from '../components/ProductCard'
+import CategoryIcon from '../components/CategoryIcon'
 
 export default function HomePage() {
   const navigate = useNavigate()
@@ -169,7 +170,9 @@ export default function HomePage() {
                 transition: 'transform 0.15s ease',
               }}
             >
-              <span style={{ fontSize: 24 }}>{cat.icon}</span>
+              <div style={{ color: 'var(--green-500)' }}>
+                <CategoryIcon slug={cat.slug} size={26} />
+              </div>
               <span style={{
                 fontSize: 11,
                 fontWeight: 500,
