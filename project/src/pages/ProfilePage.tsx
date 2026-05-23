@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { MapPin, Phone, User, CreditCard as Edit3, Save, X, ShieldCheck, Truck, Tag } from 'lucide-react'
+import YandexMapPicker from '../components/YandexMapPicker'
 
 const PROFILE_KEY = 'pharmaclick_profile'
 
@@ -7,6 +8,8 @@ type Profile = {
   name: string
   phone: string
   address: string
+  lat?: number
+  lon?: number
 }
 
 const aboutItems = [
@@ -20,6 +23,8 @@ export default function ProfilePage() {
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState<Profile>({ name: '', phone: '', address: '' })
   const [saved, setSaved] = useState(false)
+  const [showMap, setShowMap] = useState(false)
+  const [coords, setCoords] = useState<{lat: number, lon: number} | undefined>()
 
   useEffect(() => {
     const raw = localStorage.getItem(PROFILE_KEY)
@@ -27,12 +32,16 @@ export default function ProfilePage() {
       const parsed = JSON.parse(raw) as Profile
       setProfile(parsed)
       setForm(parsed)
+      if (parsed.lat && parsed.lon) {
+        setCoords({ lat: parsed.lat, lon: parsed.lon })
+      }
     }
   }, [])
 
   const handleSave = () => {
-    setProfile(form)
-    localStorage.setItem(PROFILE_KEY, JSON.stringify(form))
+    const dataToSave = { ...form, lat: coords?.lat, lon: coords?.lon }
+    setProfile(dataToSave)
+    localStorage.setItem(PROFILE_KEY, JSON.stringify(dataToSave))
     setEditing(false)
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
@@ -40,6 +49,9 @@ export default function ProfilePage() {
 
   const handleCancel = () => {
     setForm(profile)
+    if (profile.lat && profile.lon) {
+      setCoords({ lat: profile.lat, lon: profile.lon })
+    }
     setEditing(false)
   }
 
@@ -112,7 +124,16 @@ export default function ProfilePage() {
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <ProfileRow icon={<User size={16} />} label="Имя" value={editing ? undefined : (profile.name || 'не указано')} editing={editing} editValue={form.name} onEdit={v => setForm(f => ({ ...f, name: v }))} />
           <ProfileRow icon={<Phone size={16} />} label="Телефон" value={editing ? undefined : (profile.phone || 'не указан')} editing={editing} editValue={form.phone} onEdit={v => setForm(f => ({ ...f, phone: v }))} type="tel" />
-          <ProfileRow icon={<MapPin size={16} />} label="Адрес" value={editing ? undefined : (profile.address || 'не указан')} editing={editing} editValue={form.address} onEdit={v => setForm(f => ({ ...f, address: v }))} />
+          <ProfileRow 
+            icon={<MapPin size={16} />} 
+            label="Адрес" 
+            value={editing ? undefined : (profile.address || 'не указан')} 
+            editing={editing} 
+            editValue={form.address} 
+            onEdit={v => setForm(f => ({ ...f, address: v }))} 
+            isAddress={true} 
+            onAddressClick={() => setShowMap(true)} 
+          />
         </div>
       </div>
 
@@ -136,13 +157,27 @@ export default function ProfilePage() {
           ))}
         </div>
       </div>
+
+      {showMap && (
+        <YandexMapPicker
+          apiKey={import.meta.env.VITE_YANDEX_MAPS_API_KEY}
+          initialCoords={coords}
+          onSave={(addr, c) => {
+            setForm(f => ({ ...f, address: addr }))
+            setCoords(c)
+            setShowMap(false)
+          }}
+          onClose={() => setShowMap(false)}
+        />
+      )}
     </div>
   )
 }
 
-function ProfileRow({ icon, label, value, editing, editValue, onEdit, type = 'text' }: {
+function ProfileRow({ icon, label, value, editing, editValue, onEdit, type = 'text', isAddress, onAddressClick }: {
   icon: React.ReactNode; label: string; value?: string
-  editing: boolean; editValue: string; onEdit: (v: string) => void; type?: string
+  editing: boolean; editValue: string; onEdit: (v: string) => void; type?: string;
+  isAddress?: boolean; onAddressClick?: () => void;
 }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: '1px solid var(--neutral-100)' }}>
@@ -150,10 +185,23 @@ function ProfileRow({ icon, label, value, editing, editValue, onEdit, type = 'te
       <div style={{ flex: 1 }}>
         <p style={{ fontSize: 11, color: 'var(--neutral-400)', marginBottom: 1 }}>{label}</p>
         {editing ? (
-          <input type={type} value={editValue} onChange={e => onEdit(e.target.value)} style={{
-            width: '100%', fontSize: 14, fontWeight: 600, color: 'var(--neutral-800)',
-            background: 'var(--neutral-50)', border: '1px solid var(--neutral-200)', borderRadius: 6, padding: '6px 8px',
-          }} />
+          isAddress ? (
+            <div 
+              onClick={onAddressClick}
+              style={{
+                width: '100%', fontSize: 14, fontWeight: 600, color: editValue ? 'var(--neutral-800)' : 'var(--neutral-400)',
+                background: 'var(--neutral-50)', border: '1px solid var(--neutral-200)', borderRadius: 6, padding: '6px 8px',
+                cursor: 'pointer', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
+              }}
+            >
+              {editValue || 'Выбрать адрес на карте'}
+            </div>
+          ) : (
+            <input type={type} value={editValue} onChange={e => onEdit(e.target.value)} style={{
+              width: '100%', fontSize: 14, fontWeight: 600, color: 'var(--neutral-800)',
+              background: 'var(--neutral-50)', border: '1px solid var(--neutral-200)', borderRadius: 6, padding: '6px 8px',
+            }} />
+          )
         ) : (
           <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--neutral-800)' }}>{value}</p>
         )}

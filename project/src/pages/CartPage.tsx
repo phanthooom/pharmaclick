@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Trash2, Minus, Plus, ShoppingBag, MapPin, Phone, User } from 'lucide-react'
 import { useCart } from '../context/CartContext'
@@ -6,6 +6,8 @@ import { formatPrice } from '../lib/format'
 import { supabase } from '../lib/supabase'
 import { getSessionId } from '../lib/session'
 import YandexMapPicker from '../components/YandexMapPicker'
+
+const PROFILE_KEY = 'pharmaclick_profile'
 
 export default function CartPage() {
   const navigate = useNavigate()
@@ -18,10 +20,26 @@ export default function CartPage() {
   const [showMap, setShowMap] = useState(false)
   const [coords, setCoords] = useState<{lat: number, lon: number} | undefined>()
 
+  // Load saved profile data on mount
+  useEffect(() => {
+    const raw = localStorage.getItem(PROFILE_KEY)
+    if (raw) {
+      const parsed = JSON.parse(raw)
+      setForm(f => ({
+        ...f,
+        name: parsed.name || f.name,
+        phone: parsed.phone && parsed.phone.length > 5 ? parsed.phone : f.phone,
+        address: parsed.address || f.address,
+      }))
+      if (parsed.lat && parsed.lon) {
+        setCoords({ lat: parsed.lat, lon: parsed.lon })
+      }
+    }
+  }, [])
+
   if (itemCount === 0) return <EmptyCart />
 
   const validate = () => {
-    const e: Record<string, string> = {}
     if (!form.name.trim()) e.name = 'Введите имя'
     if (!form.phone.trim()) e.phone = 'Введите номер телефона'
     if (!form.address.trim()) e.address = 'Введите адрес'
