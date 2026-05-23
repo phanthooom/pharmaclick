@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { MapPin, Phone, User, CreditCard as Edit3, Save, X, ShieldCheck, Truck, Tag } from 'lucide-react'
 import YandexMapPicker from '../components/YandexMapPicker'
 
+import { getTelegramUser } from '../lib/session'
+
 const PROFILE_KEY = 'pharmaclick_profile'
 
 type Profile = {
@@ -19,6 +21,7 @@ const aboutItems = [
 ]
 
 export default function ProfilePage() {
+  const tgUser = getTelegramUser()
   const [profile, setProfile] = useState<Profile>({ name: '', phone: '', address: '' })
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState<Profile>({ name: '', phone: '', address: '' })
@@ -73,7 +76,7 @@ export default function ProfilePage() {
         </div>
         <div>
           <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 2 }}>
-            {profile.name || 'Гость'}
+            {profile.name || tgUser?.first_name || 'Гость'}
           </h2>
           <p style={{ fontSize: 13, opacity: 0.85 }}>
             {profile.phone || 'Номер не указан'}
@@ -122,7 +125,7 @@ export default function ProfilePage() {
         )}
 
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <ProfileRow icon={<User size={16} />} label="Имя" value={editing ? undefined : (profile.name || 'не указано')} editing={editing} editValue={form.name} onEdit={v => setForm(f => ({ ...f, name: v }))} />
+          <ProfileRow icon={<User size={16} />} label="Имя" value={editing ? undefined : (profile.name || tgUser?.first_name || 'не указано')} editing={editing} editValue={form.name} onEdit={v => setForm(f => ({ ...f, name: v }))} />
           <ProfileRow 
             icon={<Phone size={16} />} 
             label="Телефон" 
