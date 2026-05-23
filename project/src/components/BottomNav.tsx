@@ -1,12 +1,12 @@
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Chrome as Home, Grid3x3 as Grid3X3, ShoppingCart, ClipboardList, User } from 'lucide-react'
+import { Home, LayoutGrid, ShoppingBag, Receipt, User } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 
 const TABS = [
   { path: '/', icon: Home, label: 'Главная' },
-  { path: '/catalog', icon: Grid3X3, label: 'Каталог' },
-  { path: '/cart', icon: ShoppingCart, label: 'Корзина' },
-  { path: '/orders', icon: ClipboardList, label: 'Заказы' },
+  { path: '/catalog', icon: LayoutGrid, label: 'Каталог' },
+  { path: '/cart', icon: ShoppingBag, label: 'Корзина' },
+  { path: '/orders', icon: Receipt, label: 'Заказы' },
   { path: '/profile', icon: User, label: 'Профиль' },
 ]
 
