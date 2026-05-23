@@ -7,7 +7,7 @@ type CartContextValue = {
   itemCount: number
   totalAmount: number
   loading: boolean
-  addItem: (productId: string) => Promise<void>
+  addItem: (product: Product) => Promise<void>
   removeItem: (productId: string) => Promise<void>
   updateQuantity: (productId: string, quantity: number) => Promise<void>
   clearCart: () => Promise<void>
