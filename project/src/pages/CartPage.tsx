@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext'
 import { formatPrice } from '../lib/format'
 import { supabase } from '../lib/supabase'
 import { getSessionId } from '../lib/session'
+import YandexMapPicker from '../components/YandexMapPicker'
 
 export default function CartPage() {
   const navigate = useNavigate()
@@ -14,6 +15,8 @@ export default function CartPage() {
   const [submitting, setSubmitting] = useState(false)
   const [form, setForm] = useState({ name: '', phone: '', address: '' })
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [showMap, setShowMap] = useState(false)
+  const [coords, setCoords] = useState<{lat: number, lon: number} | undefined>()
 
   if (itemCount === 0) return <EmptyCart />
 
@@ -38,6 +41,8 @@ export default function CartPage() {
         customer_name: form.name,
         customer_phone: form.phone,
         customer_address: form.address,
+        customer_lat: coords?.lat,
+        customer_lon: coords?.lon,
         total_amount: totalAmount,
         status: 'pending',
       })
@@ -227,13 +232,35 @@ export default function CartPage() {
             type="tel"
             error={errors.phone}
           />
-          <FormField
-            icon={<MapPin size={16} />}
-            placeholder="Адрес доставки"
-            value={form.address}
-            onChange={v => setForm(f => ({ ...f, address: v }))}
-            error={errors.address}
-          />
+          {/* Address Map Trigger */}
+          <div>
+            <div
+              onClick={() => setShowMap(true)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                background: 'var(--neutral-0)',
+                border: `1.5px solid ${errors.address ? 'var(--red-400)' : 'var(--neutral-200)'}`,
+                borderRadius: 'var(--radius-md)',
+                padding: '0 14px',
+                height: 48,
+                boxShadow: 'var(--shadow-sm)',
+                cursor: 'pointer',
+              }}
+            >
+              <span style={{ color: 'var(--neutral-400)', flexShrink: 0 }}><MapPin size={16} /></span>
+              <div style={{
+                flex: 1,
+                fontSize: 14,
+                color: form.address ? 'var(--neutral-800)' : 'var(--neutral-400)',
+                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
+              }}>
+                {form.address || 'Выбрать адрес на карте'}
+              </div>
+            </div>
+            {errors.address && (
+              <p style={{ fontSize: 12, color: 'var(--red-500)', marginTop: 4, paddingLeft: 4 }}>{errors.address}</p>
+            )}
+          </div>
 
           <button
             onClick={handleOrder}
@@ -253,6 +280,19 @@ export default function CartPage() {
             {submitting ? 'Оформляем...' : 'Подтвердить заказ'}
           </button>
         </div>
+      )}
+
+      {showMap && (
+        <YandexMapPicker
+          apiKey={import.meta.env.VITE_YANDEX_MAPS_API_KEY}
+          initialCoords={coords}
+          onSave={(addr, c) => {
+            setForm(f => ({ ...f, address: addr }))
+            setCoords(c)
+            setShowMap(false)
+          }}
+          onClose={() => setShowMap(false)}
+        />
       )}
     </div>
   )
