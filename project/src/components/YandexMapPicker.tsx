@@ -160,7 +160,6 @@ export default function YandexMapPicker({
   }, [])
 
   const topPxStr = `calc(var(--tg-header-pad, ${topOffset}px) + 12px)`
-  const gpsTopStr = `calc(var(--tg-header-pad, ${topOffset}px) + 68px)`
   const errorTopStr = `calc(var(--tg-header-pad, ${topOffset}px) + 80px)`
 
   return (
@@ -171,63 +170,71 @@ export default function YandexMapPicker({
       {/* Map Container */}
       <div ref={containerRef} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} />
 
-      {/* Top Bar */}
+      {/* Top Controls Container (Layout Wrapper) */}
       <div style={{
         position: 'absolute', left: 0, right: 0, top: topPxStr,
-        zIndex: 10, display: 'flex', alignItems: 'center', gap: 12, padding: '0 16px'
+        zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 12, padding: '0 16px',
+        pointerEvents: 'none'
       }}>
-        {/* Back Button */}
+        
+        {/* Top Bar (Back Button + Address Bubble) */}
+        <div style={{
+          display: 'flex', width: '100%', alignItems: 'flex-start', gap: 12, pointerEvents: 'auto'
+        }}>
+          {/* Back Button */}
+          <button
+            type="button"
+            onClick={onClose}
+            style={{
+              width: 40, height: 40, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              borderRadius: '50%', background: '#fff', color: 'var(--neutral-900)',
+              boxShadow: '0 2px 12px rgba(0,0,0,0.15)', border: 'none'
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+
+          {/* Address Bubble */}
+          <div style={{
+            flex: 1, borderRadius: 16, background: '#fff', padding: '10px 16px',
+            fontSize: 14, fontWeight: 600, lineHeight: 1.3,
+            boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
+            color: geocoding ? 'var(--neutral-400)' : 'var(--neutral-900)'
+          }}>
+            {geocoding ? detectingLabel : address}
+          </div>
+        </div>
+
+        {/* GPS Button */}
         <button
           type="button"
-          onClick={onClose}
+          disabled={locating}
+          onClick={detectLocation}
           style={{
-            width: 40, height: 40, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            borderRadius: '50%', background: '#fff', color: 'var(--neutral-900)',
-            boxShadow: '0 2px 12px rgba(0,0,0,0.15)', border: 'none'
+            pointerEvents: 'auto',
+            width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            borderRadius: '50%', background: '#fff', border: 'none',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
+            opacity: locating ? 0.6 : 1,
+            flexShrink: 0
           }}
+          title={detectLocationLabel}
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+          {locating ? (
+            <div style={{
+              width: 20, height: 20, borderRadius: '50%', border: '3px solid var(--green-100)',
+              borderTopColor: 'var(--green-500)', animation: 'spin 1s linear infinite'
+            }} />
+          ) : (
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="3.5" stroke="var(--green-500)" strokeWidth="2" />
+              <path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke="var(--green-500)" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          )}
         </button>
-
-        {/* Address Bubble */}
-        <div style={{
-          flex: 1, borderRadius: 16, background: '#fff', padding: '10px 16px',
-          fontSize: 14, fontWeight: 600, lineHeight: 1.3,
-          boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
-          color: geocoding ? 'var(--neutral-400)' : 'var(--neutral-900)'
-        }}>
-          {geocoding ? detectingLabel : address}
-        </div>
       </div>
-
-      {/* GPS Button */}
-      <button
-        type="button"
-        disabled={locating}
-        onClick={detectLocation}
-        style={{
-          position: 'absolute', zIndex: 10, right: 16, top: gpsTopStr,
-          width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center',
-          borderRadius: '50%', background: '#fff', border: 'none',
-          boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
-          opacity: locating ? 0.6 : 1
-        }}
-        title={detectLocationLabel}
-      >
-        {locating ? (
-          <div style={{
-            width: 20, height: 20, borderRadius: '50%', border: '3px solid var(--green-100)',
-            borderTopColor: 'var(--green-500)', animation: 'spin 1s linear infinite'
-          }} />
-        ) : (
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="3.5" stroke="var(--green-500)" strokeWidth="2" />
-            <path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke="var(--green-500)" strokeWidth="2" strokeLinecap="round" />
-          </svg>
-        )}
-      </button>
 
       {/* Center Pin */}
       <div style={{
