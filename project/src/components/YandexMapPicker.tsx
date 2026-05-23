@@ -60,7 +60,7 @@ export default function YandexMapPicker({
   const geocode = useCallback(async (lat: number, lon: number) => {
     setGeocoding(true)
     try {
-      const res = await (window.ymaps as any).geocode([lat, lon], { results: 1, kind: 'house' })
+      const res = await (window.ymaps as any).geocode([lat, lon], { results: 1 })
       const first = (res as any).geoObjects.get(0)
       const text: string = first?.getAddressLine?.() ?? ''
       setAddress(text || `${lat.toFixed(5)}, ${lon.toFixed(5)}`)
