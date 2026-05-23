@@ -139,7 +139,9 @@ export default function YandexMapPicker({
     }
   }, [])
 
-  const topPx = topOffset + 12
+  const topPxStr = `calc(var(--tg-header-pad, ${topOffset}px) + 12px)`
+  const gpsTopStr = `calc(var(--tg-header-pad, ${topOffset}px) + 68px)`
+  const errorTopStr = `calc(var(--tg-header-pad, ${topOffset}px) + 80px)`
 
   return (
     <div style={{
@@ -151,7 +153,7 @@ export default function YandexMapPicker({
 
       {/* Top Bar */}
       <div style={{
-        position: 'absolute', left: 0, right: 0, top: topPx,
+        position: 'absolute', left: 0, right: 0, top: topPxStr,
         zIndex: 10, display: 'flex', alignItems: 'center', gap: 12, padding: '0 16px'
       }}>
         {/* Back Button */}
@@ -186,7 +188,7 @@ export default function YandexMapPicker({
         disabled={locating}
         onClick={detectLocation}
         style={{
-          position: 'absolute', zIndex: 10, right: 16, top: topPx + 56,
+          position: 'absolute', zIndex: 10, right: 16, top: gpsTopStr,
           width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center',
           borderRadius: '50%', background: '#fff', border: 'none',
           boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
@@ -234,7 +236,7 @@ export default function YandexMapPicker({
 
       {error && (
         <div style={{
-          position: 'absolute', left: 16, right: 16, zIndex: 20, top: topPx + 68,
+          position: 'absolute', left: 16, right: 16, zIndex: 20, top: errorTopStr,
           borderRadius: 16, background: '#fef2f2', border: '1px solid #fecaca',
           padding: '12px 16px', fontSize: 14, color: '#ef4444', textAlign: 'center'
         }}>
