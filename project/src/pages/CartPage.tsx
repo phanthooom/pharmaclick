@@ -81,6 +81,14 @@ export default function CartPage() {
         price: item.product.discount_price ?? item.product.price,
       }))
       await supabase.from('order_items').insert(orderItems)
+      
+      // Отправляем уведомление администратору в фоне
+      fetch('/api/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order, items })
+      }).catch(err => console.error('Failed to notify admin:', err))
+
       await clearCart()
       navigate('/order-success')
     }
