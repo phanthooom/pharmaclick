@@ -37,7 +37,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const addItem = async (product: Product) => {
     const existing = items.find(i => i.product_id === product.id)
     if (existing) {
-      updateQuantity(product.id, existing.quantity + 1)
+      await updateQuantity(product.id, existing.quantity + 1)
     } else {
       const newItem = {
         id: crypto.randomUUID(),
@@ -83,7 +83,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clearCart = async () => {
     setItems([])
-    supabase.from('cart_items').delete().eq('session_id', sessionId)
+    await supabase.from('cart_items').delete().eq('session_id', sessionId)
   }
 
   const getQuantity = (productId: string) =>
