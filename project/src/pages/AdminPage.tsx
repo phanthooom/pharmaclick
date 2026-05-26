@@ -49,8 +49,12 @@ function AdminDashboard() {
 
   const changeStatus = async (orderId: string, status: string) => {
     setUpdatingId(orderId)
-    await supabase.from('orders').update({ status }).eq('id', orderId)
-    setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o))
+    const { error } = await supabase.from('orders').update({ status }).eq('id', orderId)
+    if (error) {
+      alert(`Ошибка: ${error.message}`)
+    } else {
+      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o))
+    }
     setUpdatingId(null)
   }
 
