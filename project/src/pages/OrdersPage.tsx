@@ -31,8 +31,9 @@ export default function OrdersPage() {
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'orders', filter: `session_id=eq.${sessionId}` },
         (payload) => {
-          setOrders(prev => prev.map(o => o.id === payload.new.id ? { ...o, ...payload.new } : o))
-          setSelectedOrder(prev => prev?.id === payload.new.id ? { ...prev, ...payload.new } : prev)
+          const updated = payload.new as Order
+          setOrders(prev => prev.map(o => o.id === updated.id ? { ...o, ...updated } : o))
+          setSelectedOrder(prev => prev?.id === updated.id ? { ...prev, ...updated } as Order : prev)
         }
       )
       .subscribe()
