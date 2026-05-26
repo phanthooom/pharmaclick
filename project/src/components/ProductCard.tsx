@@ -3,6 +3,7 @@ import { Plus, Minus, Star } from 'lucide-react'
 import { Product } from '../lib/supabase'
 import { formatPrice, discountPercent } from '../lib/format'
 import { useCart } from '../context/CartContext'
+import { haptic } from '../lib/haptic'
 
 type Props = {
   product: Product
@@ -18,22 +19,25 @@ export default function ProductCard({ product, compact = false }: Props) {
 
   const handleAdd = async (e: React.MouseEvent) => {
     e.stopPropagation()
+    haptic('medium')
     await addItem(product)
   }
 
   const handleDecrease = async (e: React.MouseEvent) => {
     e.stopPropagation()
+    haptic('light')
     await updateQuantity(product.id, qty - 1)
   }
 
   const handleIncrease = async (e: React.MouseEvent) => {
     e.stopPropagation()
+    haptic('light')
     await updateQuantity(product.id, qty + 1)
   }
 
   return (
     <div
-      onClick={() => navigate(`/product/${product.slug}`)}
+      onClick={() => { haptic('light'); navigate(`/product/${product.slug}`) }}
       style={{
         background: 'var(--neutral-0)',
         borderRadius: 'var(--radius-lg)',

@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Home, LayoutGrid, ShoppingBag, Receipt, User } from 'lucide-react'
 import { useCart } from '../context/CartContext'
+import { haptic } from '../lib/haptic'
 
 const TABS = [
   { path: '/', icon: Home, label: 'Главная' },
@@ -39,7 +40,7 @@ export default function BottomNav() {
         return (
           <button
             key={path}
-            onClick={() => navigate(path)}
+            onClick={() => { haptic('light'); navigate(path) }}
             style={{
               flex: 1,
               height: 'var(--nav-height)',

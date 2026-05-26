@@ -6,6 +6,7 @@ import { formatPrice } from '../lib/format'
 import { supabase } from '../lib/supabase'
 import { getSessionId } from '../lib/session'
 import YandexMapPicker from '../components/YandexMapPicker'
+import { haptic, hapticNotification } from '../lib/haptic'
 
 const PROFILE_KEY = 'pharmaclick_profile'
 
@@ -49,7 +50,8 @@ export default function CartPage() {
   }
 
   const handleOrder = async () => {
-    if (!validate()) return
+    if (!validate()) { hapticNotification('error'); return }
+    haptic('medium')
     setSubmitting(true)
     const sessionId = getSessionId()
 
@@ -90,6 +92,7 @@ export default function CartPage() {
       }).catch(err => console.error('Failed to notify admin:', err))
 
       await clearCart()
+      hapticNotification('success')
       navigate('/order-success')
     }
     setSubmitting(false)
@@ -148,7 +151,7 @@ export default function CartPage() {
                     gap: 2,
                   }}>
                     <button
-                      onClick={() => updateQuantity(item.product_id, item.quantity - 1)}
+                      onClick={() => { haptic('light'); updateQuantity(item.product_id, item.quantity - 1) }}
                       style={{
                         width: 26, height: 26,
                         background: '#fff',
@@ -164,7 +167,7 @@ export default function CartPage() {
                       {item.quantity}
                     </span>
                     <button
-                      onClick={() => updateQuantity(item.product_id, item.quantity + 1)}
+                      onClick={() => { haptic('light'); updateQuantity(item.product_id, item.quantity + 1) }}
                       style={{
                         width: 26, height: 26,
                         background: 'var(--green-500)',
@@ -178,7 +181,7 @@ export default function CartPage() {
                   </div>
 
                   <button
-                    onClick={() => removeItem(item.product_id)}
+                    onClick={() => { haptic('medium'); removeItem(item.product_id) }}
                     style={{
                       width: 30, height: 30,
                       background: '#fef2f2',
@@ -228,7 +231,7 @@ export default function CartPage() {
       {!checkingOut ? (
         <div style={{ padding: '0 16px' }}>
           <button
-            onClick={() => setCheckingOut(true)}
+            onClick={() => { haptic('medium'); setCheckingOut(true) }}
             style={{
               width: '100%',
               height: 52,
@@ -409,7 +412,7 @@ function EmptyCart() {
         </p>
       </div>
       <button
-        onClick={() => navigate('/catalog')}
+        onClick={() => { haptic('light'); navigate('/catalog') }}
         style={{
           padding: '12px 28px',
           background: 'var(--green-500)',
