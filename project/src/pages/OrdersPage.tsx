@@ -12,8 +12,9 @@ export default function OrdersPage() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
 
   useEffect(() => {
+    const sessionId = getSessionId()
+
     async function load() {
-      const sessionId = getSessionId()
       const { data } = await supabase
         .from('orders')
         .select('*')
@@ -23,6 +24,20 @@ export default function OrdersPage() {
       setLoading(false)
     }
     load()
+
+    const channel = supabase
+      .channel('orders-realtime')
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'orders', filter: `session_id=eq.${sessionId}` },
+        (payload) => {
+          setOrders(prev => prev.map(o => o.id === payload.new.id ? { ...o, ...payload.new } : o))
+          setSelectedOrder(prev => prev?.id === payload.new.id ? { ...prev, ...payload.new } : prev)
+        }
+      )
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
   }, [])
 
   if (loading) return <OrdersSkeleton />
