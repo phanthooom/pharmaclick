@@ -14,19 +14,27 @@ export default function OrdersPage() {
   useEffect(() => {
     const sessionId = getSessionId()
 
-    async function load() {
+    async function fetchOrders() {
       const { data } = await supabase
         .from('orders')
         .select('*')
         .eq('session_id', sessionId)
         .order('created_at', { ascending: false })
-      setOrders((data as Order[]) ?? [])
+      if (data) {
+        setOrders(data as Order[])
+        setSelectedOrder(prev => {
+          if (!prev) return prev
+          const updated = (data as Order[]).find(o => o.id === prev.id)
+          return updated ? { ...prev, ...updated } : prev
+        })
+      }
       setLoading(false)
     }
-    load()
+    fetchOrders()
 
+    // Realtime subscription
     const channel = supabase
-      .channel('orders-realtime')
+      .channel(`orders-${sessionId}`)
       .on(
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'orders', filter: `session_id=eq.${sessionId}` },
@@ -38,7 +46,13 @@ export default function OrdersPage() {
       )
       .subscribe()
 
-    return () => { supabase.removeChannel(channel) }
+    // Polling fallback every 10s (in case realtime fails)
+    const poll = setInterval(fetchOrders, 10000)
+
+    return () => {
+      supabase.removeChannel(channel)
+      clearInterval(poll)
+    }
   }, [])
 
   if (loading) return <OrdersSkeleton />
