@@ -11,6 +11,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/profile': 'Профиль',
   '/search': 'Поиск',
   '/admin': 'Заказы (Админ)',
+  '/favorites': 'Избранное',
 }
 
 export default function Header() {
@@ -29,7 +30,7 @@ export default function Header() {
     ? 'Категория'
     : PAGE_TITLES[location.pathname] ?? 'PharmaClick'
 
-  const showBack = isProduct || isCatalogChild || location.pathname === '/cart' || location.pathname === '/orders' || location.pathname === '/profile' || location.pathname === '/search' || location.pathname === '/admin'
+  const showBack = isProduct || isCatalogChild || location.pathname === '/cart' || location.pathname === '/orders' || location.pathname === '/profile' || location.pathname === '/search' || location.pathname === '/admin' || location.pathname === '/favorites'
 
   const showSearch = location.pathname === '/' || location.pathname === '/catalog' || location.pathname.startsWith('/catalog/')
 

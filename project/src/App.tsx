@@ -12,6 +12,8 @@ import ProfilePage from './pages/ProfilePage'
 import OrderSuccessPage from './pages/OrderSuccessPage'
 import SearchPage from './pages/SearchPage'
 import AdminPage from './pages/AdminPage'
+import FavoritesPage from './pages/FavoritesPage'
+import { FavoritesProvider } from './context/FavoritesContext'
 
 function setCss(name: string, value: string) {
   document.documentElement.style.setProperty(name, value)
@@ -48,6 +50,7 @@ export default function App() {
   return (
     <>
       {!splashDone && <SplashScreen onDone={() => setSplashDone(true)} />}
+    <FavoritesProvider>
     <CartProvider>
       <BrowserRouter>
         <Routes>
@@ -62,10 +65,12 @@ export default function App() {
             <Route path="/order-success" element={<OrderSuccessPage />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/admin" element={<AdminPage />} />
+            <Route path="/favorites" element={<FavoritesPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
     </CartProvider>
+    </FavoritesProvider>
     </>
   )
 }

@@ -1,8 +1,9 @@
 import { useNavigate } from 'react-router-dom'
-import { Plus, Minus, Star } from 'lucide-react'
+import { Plus, Minus, Star, Heart } from 'lucide-react'
 import { Product } from '../lib/supabase'
 import { formatPrice, discountPercent } from '../lib/format'
 import { useCart } from '../context/CartContext'
+import { useFavorites } from '../context/FavoritesContext'
 import { haptic } from '../lib/haptic'
 
 type Props = {
@@ -13,7 +14,9 @@ type Props = {
 export default function ProductCard({ product, compact = false }: Props) {
   const navigate = useNavigate()
   const { addItem, removeItem, updateQuantity, getQuantity } = useCart()
+  const { isFavorite, toggleFavorite } = useFavorites()
   const qty = getQuantity(product.id)
+  const fav = isFavorite(product.id)
   const price = product.discount_price ?? product.price
   const hasDiscount = !!product.discount_price
 
@@ -58,6 +61,20 @@ export default function ProductCard({ product, compact = false }: Props) {
         el.style.transform = 'scale(1)'
       }}
     >
+      {/* Favorite button */}
+      <button
+        onClick={e => { e.stopPropagation(); haptic('light'); toggleFavorite(product.id) }}
+        style={{
+          position: 'absolute', top: 8, right: 8, zIndex: 2,
+          width: 30, height: 30, borderRadius: '50%',
+          background: 'rgba(255,255,255,0.9)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
+        }}
+      >
+        <Heart size={15} color={fav ? '#ef4444' : 'var(--neutral-400)'} fill={fav ? '#ef4444' : 'none'} />
+      </button>
+
       {/* Badges */}
       <div style={{
         position: 'absolute', top: 8, left: 8, zIndex: 2,

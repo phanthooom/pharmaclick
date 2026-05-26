@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { MapPin, Phone, User, CreditCard as Edit3, Save, X, ShieldCheck, Truck, Tag, Settings } from 'lucide-react'
+import { MapPin, Phone, User, CreditCard as Edit3, Save, X, ShieldCheck, Truck, Tag, Settings, Heart, ShoppingBag } from 'lucide-react'
 import YandexMapPicker from '../components/YandexMapPicker'
 import { getTelegramUser, getSessionId } from '../lib/session'
+import { useFavorites } from '../context/FavoritesContext'
+import { supabase } from '../lib/supabase'
+import { formatPrice } from '../lib/format'
 
 const PROFILE_KEY = 'pharmaclick_profile'
 
@@ -24,6 +27,24 @@ export default function ProfilePage() {
   const navigate = useNavigate()
   const tgUser = getTelegramUser()
   const isAdmin = getSessionId() === 'tg_638384527'
+  const { favorites } = useFavorites()
+  const [orderStats, setOrderStats] = useState<{ count: number; total: number } | null>(null)
+
+  useEffect(() => {
+    const sessionId = getSessionId()
+    supabase
+      .from('orders')
+      .select('total_amount')
+      .eq('session_id', sessionId)
+      .then(({ data }) => {
+        if (data) {
+          setOrderStats({
+            count: data.length,
+            total: data.reduce((sum, o) => sum + (o.total_amount || 0), 0),
+          })
+        }
+      })
+  }, [])
   const [profile, setProfile] = useState<Profile>({ name: '', phone: '', address: '' })
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState<Profile>({ name: '', phone: '', address: '' })
@@ -82,6 +103,37 @@ export default function ProfilePage() {
           </h2>
           <p style={{ fontSize: 13, opacity: 0.85 }}>
             {profile.phone || 'Номер не указан'}
+          </p>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        <button
+          onClick={() => navigate('/favorites')}
+          style={{
+            background: 'var(--neutral-0)', borderRadius: 'var(--radius-lg)',
+            padding: '14px', boxShadow: 'var(--shadow-sm)',
+            display: 'flex', flexDirection: 'column', gap: 6, textAlign: 'left',
+          }}
+        >
+          <div style={{ width: 34, height: 34, borderRadius: 10, background: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Heart size={16} color="#ef4444" fill={favorites.length > 0 ? '#ef4444' : 'none'} />
+          </div>
+          <p style={{ fontSize: 20, fontWeight: 800, color: 'var(--neutral-900)' }}>{favorites.length}</p>
+          <p style={{ fontSize: 12, color: 'var(--neutral-400)' }}>Избранных</p>
+        </button>
+        <div style={{
+          background: 'var(--neutral-0)', borderRadius: 'var(--radius-lg)',
+          padding: '14px', boxShadow: 'var(--shadow-sm)',
+          display: 'flex', flexDirection: 'column', gap: 6,
+        }}>
+          <div style={{ width: 34, height: 34, borderRadius: 10, background: 'var(--green-50)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <ShoppingBag size={16} color="var(--green-600)" />
+          </div>
+          <p style={{ fontSize: 20, fontWeight: 800, color: 'var(--neutral-900)' }}>{orderStats?.count ?? '—'}</p>
+          <p style={{ fontSize: 12, color: 'var(--neutral-400)' }}>
+            {orderStats ? formatPrice(orderStats.total) : 'Заказов'}
           </p>
         </div>
       </div>

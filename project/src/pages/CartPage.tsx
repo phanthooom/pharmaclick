@@ -13,6 +13,10 @@ const PROFILE_KEY = 'pharmaclick_profile'
 export default function CartPage() {
   const navigate = useNavigate()
   const { items, totalAmount, updateQuantity, removeItem, clearCart, itemCount } = useCart()
+  const DELIVERY_THRESHOLD = 100000
+  const DELIVERY_FEE = 15000
+  const deliveryFee = totalAmount < DELIVERY_THRESHOLD ? DELIVERY_FEE : 0
+  const finalAmount = totalAmount + deliveryFee
 
   const [checkingOut, setCheckingOut] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -64,7 +68,7 @@ export default function CartPage() {
         customer_address: form.address,
         customer_lat: coords?.lat,
         customer_lon: coords?.lon,
-        total_amount: totalAmount,
+        total_amount: finalAmount,
         status: 'pending',
       })
       .select()
@@ -211,10 +215,17 @@ export default function CartPage() {
           <span style={{ fontSize: 14, color: 'var(--neutral-500)' }}>Товаров: {itemCount}</span>
           <span style={{ fontSize: 14, color: 'var(--neutral-500)' }}>{formatPrice(totalAmount)}</span>
         </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
           <span style={{ fontSize: 14, color: 'var(--neutral-500)' }}>Доставка</span>
-          <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--green-600)' }}>Бесплатно</span>
+          <span style={{ fontSize: 14, fontWeight: 600, color: deliveryFee === 0 ? 'var(--green-600)' : 'var(--neutral-800)' }}>
+            {deliveryFee === 0 ? 'Бесплатно' : formatPrice(deliveryFee)}
+          </span>
         </div>
+        {deliveryFee > 0 && (
+          <p style={{ fontSize: 11, color: 'var(--neutral-400)', marginBottom: 8 }}>
+            Бесплатно при заказе от {formatPrice(DELIVERY_THRESHOLD)}
+          </p>
+        )}
         <div style={{
           borderTop: '1px dashed var(--neutral-200)',
           paddingTop: 10,
@@ -222,7 +233,7 @@ export default function CartPage() {
         }}>
           <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--neutral-900)' }}>Итого</span>
           <span style={{ fontSize: 18, fontWeight: 800, color: 'var(--neutral-900)', letterSpacing: '-0.3px' }}>
-            {formatPrice(totalAmount)}
+            {formatPrice(finalAmount)}
           </span>
         </div>
       </div>
