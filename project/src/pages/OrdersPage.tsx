@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronRight, Package, Clock, CircleCheck as CheckCircle2, X, MapPin } from 'lucide-react'
+import { ChevronRight, Package, Clock, CircleCheck as CheckCircle2, X, MapPin, Truck } from 'lucide-react'
 import { supabase, Order } from '../lib/supabase'
 import { getSessionId } from '../lib/session'
 import { formatPrice } from '../lib/format'
@@ -215,9 +215,12 @@ function OrderBottomSheet({ order, onClose }: { order: Order | null, onClose: ()
         {/* Scrollable Content */}
         <div style={{ overflowY: 'auto', padding: '16px', flex: 1 }} className="hide-scrollbar">
           
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-            <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--neutral-800)' }}>Статус</span>
-            <StatusBadge status={order.status} />
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--neutral-800)' }}>Статус</span>
+              <StatusBadge status={order.status} />
+            </div>
+            <StatusStepper status={order.status} />
           </div>
 
           <div style={{
@@ -304,6 +307,12 @@ function StatusBadge({ status }: { status: string }) {
       bg: '#eff6ff',
       icon: <CheckCircle2 size={12} />,
     },
+    shipping: {
+      label: 'В пути',
+      color: '#7c3aed',
+      bg: '#f5f3ff',
+      icon: <Truck size={12} />,
+    },
     delivered: {
       label: 'Доставлен',
       color: 'var(--green-600)',
@@ -332,6 +341,70 @@ function StatusBadge({ status }: { status: string }) {
       {c.icon}
       {c.label}
     </span>
+  )
+}
+
+function StatusStepper({ status }: { status: string }) {
+  const steps = [
+    { key: 'pending', label: 'Принят', icon: <Clock size={14} /> },
+    { key: 'confirmed', label: 'Подтверждён', icon: <CheckCircle2 size={14} /> },
+    { key: 'shipping', label: 'В пути', icon: <Truck size={14} /> },
+    { key: 'delivered', label: 'Доставлен', icon: <Package size={14} /> },
+  ]
+
+  const order = ['pending', 'confirmed', 'shipping', 'delivered']
+  const isCancelled = status === 'cancelled'
+  const currentIdx = isCancelled ? -1 : order.indexOf(status)
+
+  if (isCancelled) {
+    return (
+      <div style={{
+        background: '#fef2f2', borderRadius: 'var(--radius-md)', padding: '12px 16px',
+        display: 'flex', alignItems: 'center', gap: 10,
+      }}>
+        <X size={16} color="var(--red-500)" />
+        <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--red-600)' }}>Заказ отменён</span>
+      </div>
+    )
+  }
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 0 }}>
+      {steps.map((step, i) => {
+        const done = i < currentIdx
+        const active = i === currentIdx
+        return (
+          <div key={step.key} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
+            {/* Connector line left */}
+            {i > 0 && (
+              <div style={{
+                position: 'absolute', top: 14, right: '50%', left: '-50%', height: 2,
+                background: done || active ? 'var(--green-500)' : 'var(--neutral-200)',
+                transition: 'background 0.3s',
+              }} />
+            )}
+            {/* Circle */}
+            <div style={{
+              width: 28, height: 28, borderRadius: '50%', zIndex: 1,
+              background: done ? 'var(--green-500)' : active ? 'var(--green-500)' : 'var(--neutral-100)',
+              border: active ? '3px solid var(--green-200)' : 'none',
+              color: done || active ? '#fff' : 'var(--neutral-400)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              transition: 'all 0.3s',
+            }}>
+              {step.icon}
+            </div>
+            <span style={{
+              fontSize: 10, fontWeight: active ? 700 : 500, marginTop: 6, textAlign: 'center',
+              color: done || active ? 'var(--neutral-800)' : 'var(--neutral-400)',
+              lineHeight: 1.2,
+            }}>
+              {step.label}
+            </span>
+          </div>
+        )
+      })}
+    </div>
   )
 }
 
