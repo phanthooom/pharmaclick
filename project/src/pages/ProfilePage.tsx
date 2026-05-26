@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
-import { MapPin, Phone, User, CreditCard as Edit3, Save, X, ShieldCheck, Truck, Tag } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { MapPin, Phone, User, CreditCard as Edit3, Save, X, ShieldCheck, Truck, Tag, Settings } from 'lucide-react'
 import YandexMapPicker from '../components/YandexMapPicker'
-
-import { getTelegramUser } from '../lib/session'
+import { getTelegramUser, getSessionId } from '../lib/session'
 
 const PROFILE_KEY = 'pharmaclick_profile'
 
@@ -21,7 +21,9 @@ const aboutItems = [
 ]
 
 export default function ProfilePage() {
+  const navigate = useNavigate()
   const tgUser = getTelegramUser()
+  const isAdmin = getSessionId() === 'tg_638384527'
   const [profile, setProfile] = useState<Profile>({ name: '', phone: '', address: '' })
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState<Profile>({ name: '', phone: '', address: '' })
@@ -153,6 +155,26 @@ export default function ProfilePage() {
           />
         </div>
       </div>
+
+      {isAdmin && (
+        <button
+          onClick={() => navigate('/admin')}
+          style={{
+            width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+            background: 'var(--neutral-0)', borderRadius: 'var(--radius-lg)',
+            padding: '14px 16px', boxShadow: 'var(--shadow-sm)',
+            color: 'var(--neutral-800)',
+          }}
+        >
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <Settings size={18} color="var(--blue-600)" />
+          </div>
+          <div style={{ flex: 1, textAlign: 'left' }}>
+            <p style={{ fontSize: 14, fontWeight: 700 }}>Панель администратора</p>
+            <p style={{ fontSize: 12, color: 'var(--neutral-400)', marginTop: 1 }}>Управление заказами</p>
+          </div>
+        </button>
+      )}
 
       <div style={{ background: 'var(--neutral-0)', borderRadius: 'var(--radius-lg)', padding: '16px', boxShadow: 'var(--shadow-sm)' }}>
         <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--neutral-800)', marginBottom: 12 }}>О PharmaClick</h3>

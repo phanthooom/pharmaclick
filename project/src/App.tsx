@@ -10,6 +10,8 @@ import CartPage from './pages/CartPage'
 import OrdersPage from './pages/OrdersPage'
 import ProfilePage from './pages/ProfilePage'
 import OrderSuccessPage from './pages/OrderSuccessPage'
+import SearchPage from './pages/SearchPage'
+import AdminPage from './pages/AdminPage'
 
 function setCss(name: string, value: string) {
   document.documentElement.style.setProperty(name, value)
@@ -58,6 +60,8 @@ export default function App() {
             <Route path="/orders" element={<OrdersPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/order-success" element={<OrderSuccessPage />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/admin" element={<AdminPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

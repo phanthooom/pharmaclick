@@ -9,6 +9,8 @@ const PAGE_TITLES: Record<string, string> = {
   '/cart': 'Корзина',
   '/orders': 'Заказы',
   '/profile': 'Профиль',
+  '/search': 'Поиск',
+  '/admin': 'Заказы (Админ)',
 }
 
 export default function Header() {
@@ -27,7 +29,7 @@ export default function Header() {
     ? 'Категория'
     : PAGE_TITLES[location.pathname] ?? 'PharmaClick'
 
-  const showBack = isProduct || isCatalogChild || location.pathname === '/cart' || location.pathname === '/orders' || location.pathname === '/profile'
+  const showBack = isProduct || isCatalogChild || location.pathname === '/cart' || location.pathname === '/orders' || location.pathname === '/profile' || location.pathname === '/search' || location.pathname === '/admin'
 
   const showSearch = location.pathname === '/' || location.pathname === '/catalog' || location.pathname.startsWith('/catalog/')
 
@@ -104,6 +106,9 @@ export default function Header() {
             type="text"
             placeholder="Поиск товаров..."
             value={searchParams.get('q') || ''}
+            onFocus={() => {
+              if (location.pathname === '/') navigate('/search')
+            }}
             onChange={(e) => {
               const val = e.target.value
               if (location.pathname !== '/catalog') {
