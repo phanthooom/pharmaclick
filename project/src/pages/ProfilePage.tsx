@@ -26,7 +26,7 @@ const aboutItems = [
 export default function ProfilePage() {
   const navigate = useNavigate()
   const tgUser = getTelegramUser()
-  const isAdmin = getSessionId() === 'tg_638384527'
+  const isAdmin = ['tg_638384527', 'tg_6543511525'].includes(getSessionId())
   const { favorites } = useFavorites()
   const [orderStats, setOrderStats] = useState<{ count: number; total: number } | null>(null)
 

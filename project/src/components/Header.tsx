@@ -88,9 +88,9 @@ export default function Header() {
       ) : (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <img
-            src="/logo.jpg"
+            src="/shoshi-logo.png"
             alt="PharmaClick"
-            style={{ width: 36, height: 36, borderRadius: 10, objectFit: 'cover', flexShrink: 0 }}
+            style={{ width: 36, height: 36, borderRadius: 8, objectFit: 'contain', flexShrink: 0 }}
           />
         </div>
       )}

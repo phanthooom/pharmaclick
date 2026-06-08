@@ -4,6 +4,7 @@ import { ChevronRight, Package, Clock, CircleCheck as CheckCircle2, X, MapPin, T
 import { supabase, Order } from '../lib/supabase'
 import { getSessionId } from '../lib/session'
 import { formatPrice } from '../lib/format'
+import CourierMap from '../components/CourierMap'
 
 export default function OrdersPage() {
   const navigate = useNavigate()
@@ -252,6 +253,18 @@ function OrderBottomSheet({ order, onClose }: { order: Order | null, onClose: ()
             </div>
             <StatusStepper status={order.status} />
           </div>
+
+          {order.status === 'shipping' && (
+            <div style={{ marginBottom: 16 }}>
+              <CourierMap
+                apiKey={import.meta.env.VITE_YANDEX_MAPS_API_KEY}
+                courierLat={order.courier_lat}
+                courierLon={order.courier_lon}
+                customerLat={order.customer_lat}
+                customerLon={order.customer_lon}
+              />
+            </div>
+          )}
 
           <div style={{
             background: '#fff', borderRadius: 'var(--radius-lg)', padding: '16px',

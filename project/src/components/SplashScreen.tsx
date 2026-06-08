@@ -24,12 +24,13 @@ export default function SplashScreen({ onDone }: { onDone: () => void }) {
       pointerEvents: fading ? 'none' : 'auto',
     }}>
       <img
-        src="/logo.jpg"
+        src="/shoshi-logo.png"
         alt="PharmaClick"
         style={{
           width: 100,
           height: 100,
-          borderRadius: 28,
+          borderRadius: 20,
+          objectFit: 'contain',
           boxShadow: '0 12px 40px rgba(0,0,0,0.25)',
           marginBottom: 24,
         }}

@@ -1,10 +1,13 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { RefreshCw, Phone, MapPin, ChevronDown, ChevronUp } from 'lucide-react'
 import { supabase, Order } from '../lib/supabase'
 import { getSessionId } from '../lib/session'
 import { formatPrice } from '../lib/format'
 
-const ADMIN_SESSION = 'tg_638384527'
+const PHARMACY_LAT = 41.2995
+const PHARMACY_LON = 69.2401
+
+const ADMIN_SESSIONS = ['tg_638384527', 'tg_6543511525']
 
 const STATUSES = [
   { key: 'pending',   label: 'В обработке', color: 'var(--amber-600)',  bg: '#fffbeb' },
@@ -15,7 +18,7 @@ const STATUSES = [
 ]
 
 export default function AdminPage() {
-  if (getSessionId() !== ADMIN_SESSION) {
+  if (!ADMIN_SESSIONS.includes(getSessionId())) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '80px 24px', textAlign: 'center', gap: 12 }}>
         <span style={{ fontSize: 48 }}>🔒</span>
@@ -34,6 +37,8 @@ function AdminDashboard() {
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [orderItems, setOrderItems] = useState<Record<string, any[]>>({})
   const [filterStatus, setFilterStatus] = useState<string>('all')
+  const [simulatingId, setSimulatingId] = useState<string | null>(null)
+  const simIntervals = useRef<Record<string, ReturnType<typeof setInterval>>>({})
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -47,6 +52,41 @@ function AdminDashboard() {
 
   useEffect(() => { load() }, [load])
 
+  useEffect(() => {
+    const intervals = simIntervals.current
+    return () => { Object.values(intervals).forEach(clearInterval) }
+  }, [])
+
+  const startSimulation = (order: Order) => {
+    if (!order.customer_lat || !order.customer_lon) {
+      alert('У заказа нет координат клиента')
+      return
+    }
+    if (simIntervals.current[order.id]) return
+
+    const STEPS = 20
+    let step = 0
+    setSimulatingId(order.id)
+
+    const interval = setInterval(async () => {
+      step++
+      const t = step / STEPS
+      const lat = PHARMACY_LAT + (order.customer_lat! - PHARMACY_LAT) * t
+      const lon = PHARMACY_LON + (order.customer_lon! - PHARMACY_LON) * t
+
+      await supabase.from('orders').update({ courier_lat: lat, courier_lon: lon }).eq('id', order.id)
+      setOrders(prev => prev.map(o => o.id === order.id ? { ...o, courier_lat: lat, courier_lon: lon } : o))
+
+      if (step >= STEPS) {
+        clearInterval(interval)
+        delete simIntervals.current[order.id]
+        setSimulatingId(null)
+      }
+    }, 3000)
+
+    simIntervals.current[order.id] = interval
+  }
+
   const changeStatus = async (orderId: string, status: string) => {
     setUpdatingId(orderId)
     const { error } = await supabase.from('orders').update({ status }).eq('id', orderId)
@@ -54,6 +94,19 @@ function AdminDashboard() {
       alert(`Ошибка: ${error.message}`)
     } else {
       setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o))
+      const order = orders.find(o => o.id === orderId)
+      if (order) {
+        const chatId = order.session_id.startsWith('tg_')
+          ? order.session_id.slice(3)
+          : null
+        if (chatId) {
+          fetch('/api/status-notify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chatId, status, orderId }),
+          }).catch(() => {})
+        }
+      }
     }
     setUpdatingId(null)
   }
@@ -214,6 +267,27 @@ function AdminDashboard() {
                     </button>
                   ))}
                 </div>
+
+                {/* Simulation button */}
+                {order.status === 'shipping' && (
+                  <div style={{ padding: '0 16px 10px' }}>
+                    <button
+                      onClick={() => startSimulation(order)}
+                      disabled={simulatingId === order.id}
+                      style={{
+                        width: '100%', padding: '8px 12px',
+                        borderRadius: 'var(--radius-full)',
+                        fontSize: 12, fontWeight: 700,
+                        background: simulatingId === order.id ? 'var(--neutral-100)' : '#7c3aed',
+                        color: simulatingId === order.id ? 'var(--neutral-400)' : '#fff',
+                        transition: 'all 0.15s',
+                        opacity: simulatingId === order.id ? 0.7 : 1,
+                      }}
+                    >
+                      {simulatingId === order.id ? '🚴 Симуляция идёт...' : '🚴 Запустить симуляцию доставки'}
+                    </button>
+                  </div>
+                )}
 
                 {/* Expand toggle */}
                 <button

@@ -59,6 +59,10 @@ export type Order = {
   customer_name: string
   customer_phone: string
   customer_address: string
+  customer_lat?: number
+  customer_lon?: number
+  courier_lat?: number
+  courier_lon?: number
   total_amount: number
   status: string
   created_at: string
