@@ -1,4 +1,4 @@
-const SESSION_KEY = 'pharmaclick_session'
+const SESSION_KEY = 'shoshiypharm_session'
 
 export function getSessionId(): string {
   const tgUser = (window as any).Telegram?.WebApp?.initDataUnsafe?.user

@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 
-const FAVORITES_KEY = 'pharmaclick_favorites'
+const FAVORITES_KEY = 'shoshiypharm_favorites'
 
 type FavoritesContextValue = {
   favorites: string[]

@@ -25,7 +25,7 @@ export default function SplashScreen({ onDone }: { onDone: () => void }) {
     }}>
       <img
         src="/shoshi-logo.png"
-        alt="PharmaClick"
+        alt="Shoshiypharm"
         style={{
           width: 100,
           height: 100,
@@ -41,7 +41,7 @@ export default function SplashScreen({ onDone }: { onDone: () => void }) {
         color: '#fff',
         letterSpacing: '-0.5px',
       }}>
-        PharmaClick
+        Shoshiypharm
       </div>
       <div style={{
         fontSize: 14,

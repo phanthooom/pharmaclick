@@ -1,7 +1,7 @@
 export default async function handler(req: any, res: any) {
   // Проверка метода
   if (req.method !== 'POST') {
-    return res.status(200).send('PharmaClick Bot is running.')
+    return res.status(200).send('Shoshiypharm Bot is running.')
   }
 
   const message = req.body?.message
@@ -16,7 +16,7 @@ export default async function handler(req: any, res: any) {
   const firstName = message.from.first_name || 'друг'
 
   const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN
-  const WEB_APP_URL = process.env.VITE_PUBLIC_URL || 'https://pharmaclick.vercel.app' // Или подставьте сюда вашу ссылку Vercel
+  const WEB_APP_URL = process.env.VITE_PUBLIC_URL || 'https://shoshiypharm.vercel.app' // Или подставьте сюда вашу ссылку Vercel
 
   if (!BOT_TOKEN) {
     console.error('TELEGRAM_BOT_TOKEN is not set in environment variables')
@@ -24,7 +24,7 @@ export default async function handler(req: any, res: any) {
   }
 
   if (text.startsWith('/start')) {
-    const welcomeText = `Здравствуйте, ${firstName}! Добро пожаловать в **PharmaClick** 💊\n\nЗдесь вы можете заказать медикаменты с быстрой доставкой на дом. \n\nНажмите кнопку ниже, чтобы открыть наш удобный каталог.`
+    const welcomeText = `Здравствуйте, ${firstName}! Добро пожаловать в **Shoshiypharm** 💊\n\nЗдесь вы можете заказать медикаменты с быстрой доставкой на дом. \n\nНажмите кнопку ниже, чтобы открыть наш удобный каталог.`
     
     try {
       await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {

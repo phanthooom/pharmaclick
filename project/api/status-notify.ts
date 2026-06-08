@@ -7,7 +7,7 @@ export default async function handler(req: any, res: any) {
   const MESSAGES: Record<string, string> = {
     confirmed: '✅ Ваш заказ <b>#{id}</b> подтверждён! Уже готовим к отправке.',
     shipping:  '🚴 Курьер едет к вам! Заказ <b>#{id}</b> в пути.',
-    delivered: '🎉 Заказ <b>#{id}</b> доставлен! Спасибо за покупку в PharmaClick.',
+    delivered: '🎉 Заказ <b>#{id}</b> доставлен! Спасибо за покупку в Shoshiypharm.',
     cancelled: '❌ Заказ <b>#{id}</b> отменён. Свяжитесь с нами если есть вопросы.',
   }
 

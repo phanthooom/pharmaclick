@@ -58,7 +58,7 @@ export default function CourierMap({ apiKey, courierLat, courierLon, customerLat
       // Pharmacy marker
       map.geoObjects.add(new window.ymaps.Placemark(
         [PHARMACY.lat, PHARMACY.lon],
-        { balloonContent: 'Аптека PharmaClick' },
+        { balloonContent: 'Аптека Shoshiypharm' },
         {
           preset: 'islands#greenMedicalIcon',
           iconColor: '#00875A',

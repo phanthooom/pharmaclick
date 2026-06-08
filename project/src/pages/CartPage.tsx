@@ -8,7 +8,7 @@ import { getSessionId } from '../lib/session'
 import YandexMapPicker from '../components/YandexMapPicker'
 import { haptic, hapticNotification } from '../lib/haptic'
 
-const PROFILE_KEY = 'pharmaclick_profile'
+const PROFILE_KEY = 'shoshiypharm_profile'
 
 export default function CartPage() {
   const navigate = useNavigate()

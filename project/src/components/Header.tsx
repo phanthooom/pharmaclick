@@ -4,7 +4,7 @@ import { ArrowLeft, Search, ShoppingCart } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 
 const PAGE_TITLES: Record<string, string> = {
-  '/': 'PharmaClick',
+  '/': 'Shoshiypharm',
   '/catalog': 'Каталог',
   '/cart': 'Корзина',
   '/orders': 'Заказы',
@@ -28,7 +28,7 @@ export default function Header() {
     ? 'Товар'
     : isCatalogChild
     ? 'Категория'
-    : PAGE_TITLES[location.pathname] ?? 'PharmaClick'
+    : PAGE_TITLES[location.pathname] ?? 'Shoshiypharm'
 
   const showBack = isProduct || isCatalogChild || location.pathname === '/cart' || location.pathname === '/orders' || location.pathname === '/profile' || location.pathname === '/search' || location.pathname === '/admin' || location.pathname === '/favorites'
 
@@ -89,7 +89,7 @@ export default function Header() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <img
             src="/shoshi-logo.png"
-            alt="PharmaClick"
+            alt="Shoshiypharm"
             style={{ width: 36, height: 36, borderRadius: 8, objectFit: 'contain', flexShrink: 0 }}
           />
         </div>

@@ -7,7 +7,7 @@ import { useFavorites } from '../context/FavoritesContext'
 import { supabase } from '../lib/supabase'
 import { formatPrice } from '../lib/format'
 
-const PROFILE_KEY = 'pharmaclick_profile'
+const PROFILE_KEY = 'shoshiypharm_profile'
 
 type Profile = {
   name: string
@@ -229,7 +229,7 @@ export default function ProfilePage() {
       )}
 
       <div style={{ background: 'var(--neutral-0)', borderRadius: 'var(--radius-lg)', padding: '16px', boxShadow: 'var(--shadow-sm)' }}>
-        <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--neutral-800)', marginBottom: 12 }}>О PharmaClick</h3>
+        <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--neutral-800)', marginBottom: 12 }}>О Shoshiypharm</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {aboutItems.map(({ Icon, title, desc }) => (
             <div key={title} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
