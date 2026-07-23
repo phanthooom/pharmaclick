@@ -14,23 +14,41 @@ export default function HomePage() {
 
   useEffect(() => {
     async function load() {
-      const [{ data: feat }, { data: newP }, { data: cats }] = await Promise.all([
-        supabase
+      try {
+        // Fetch categories first
+        const { data: cats, error: e3 } = await supabase.from('categories').select('*').order('created_at')
+        if (e3) console.error('Error fetching categories:', e3)
+
+        // Try fetching products with relational joins
+        let { data: feat, error: e1 } = await supabase
           .from('products')
           .select('*, category:categories(name), brand:brands(name)')
           .eq('is_featured', true)
-          .limit(6),
-        supabase
+          .limit(6)
+
+        let { data: newP, error: e2 } = await supabase
           .from('products')
           .select('*, category:categories(name), brand:brands(name)')
           .eq('is_new', true)
-          .limit(6),
-        supabase.from('categories').select('*').order('sort_order'),
-      ])
-      setFeatured((feat as Product[]) ?? [])
-      setNewProducts((newP as Product[]) ?? [])
-      setCategories((cats as Category[]) ?? [])
-      setLoading(false)
+          .limit(6)
+
+        // If relational join fails (400 Bad Request due to missing foreign keys), fallback to standard select('*')
+        if (e1 || e2 || (!feat?.length && !newP?.length)) {
+          const { data: rawProducts } = await supabase.from('products').select('*').limit(12)
+          if (rawProducts && rawProducts.length > 0) {
+            feat = rawProducts.slice(0, 6)
+            newP = rawProducts.slice(6, 12)
+          }
+        }
+
+        setFeatured((feat as Product[]) ?? [])
+        setNewProducts((newP as Product[]) ?? [])
+        setCategories((cats as Category[]) ?? [])
+      } catch (err) {
+        console.error('Unexpected error loading home data:', err)
+      } finally {
+        setLoading(false)
+      }
     }
     load()
   }, [])
@@ -147,49 +165,61 @@ export default function HomePage() {
         title="Категории"
         onMore={() => navigate('/catalog')}
       >
-        <div style={{
-          display: 'flex',
-          gap: 10,
-          overflowX: 'auto',
-          padding: '4px 16px',
-        }}
-          className="hide-scrollbar"
-        >
-          {categories.map(cat => (
-            <button
-              key={cat.id}
-              onClick={() => navigate(`/catalog/${cat.slug}`)}
-              style={{
-                flexShrink: 0,
-                display: 'flex', flexDirection: 'column', alignItems: 'center',
-                gap: 8, padding: '12px 16px',
-                background: 'var(--neutral-0)',
-                borderRadius: 'var(--radius-lg)',
-                boxShadow: 'var(--shadow-sm)',
-                minWidth: 76,
-              }}
-            >
-              <div style={{ color: 'var(--green-500)' }}>
-                <CategoryIcon slug={cat.slug} name={cat.name} size={28} />
-              </div>
-              <span style={{
-                fontSize: 12,
-                fontWeight: 600,
-                color: 'var(--neutral-800)',
-                whiteSpace: 'nowrap',
-                letterSpacing: '-0.2px',
-              }}>
-                {cat.name}
-              </span>
-            </button>
-          ))}
-        </div>
+        {categories.length > 0 ? (
+          <div style={{
+            display: 'flex',
+            gap: 10,
+            overflowX: 'auto',
+            padding: '4px 16px',
+          }}
+            className="hide-scrollbar"
+          >
+            {categories.map(cat => (
+              <button
+                key={cat.id}
+                onClick={() => navigate(`/catalog/${cat.slug}`)}
+                style={{
+                  flexShrink: 0,
+                  display: 'flex', flexDirection: 'column', alignItems: 'center',
+                  gap: 8, padding: '12px 16px',
+                  background: 'var(--neutral-0)',
+                  borderRadius: 'var(--radius-lg)',
+                  boxShadow: 'var(--shadow-sm)',
+                  minWidth: 76,
+                }}
+              >
+                <div style={{ color: 'var(--green-500)' }}>
+                  <CategoryIcon slug={cat.slug} name={cat.name} size={28} />
+                </div>
+                <span style={{
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: 'var(--neutral-800)',
+                  whiteSpace: 'nowrap',
+                  letterSpacing: '-0.2px',
+                }}>
+                  {cat.name}
+                </span>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div style={{ padding: '12px 16px', color: 'var(--neutral-400)', fontSize: 13, textAlign: 'center' }}>
+            Категории не найдены в базе данных
+          </div>
+        )}
       </Section>
 
-      {/* Featured */}
-      {featured.length > 0 && (
+      {/* Featured / Products */}
+      {featured.length > 0 ? (
         <Section title="Рекомендуем" onMore={() => navigate('/catalog')}>
           <ProductGrid products={featured} />
+        </Section>
+      ) : (
+        <Section title="Товары" onMore={() => navigate('/catalog')}>
+          <div style={{ padding: '24px 16px', color: 'var(--neutral-400)', fontSize: 13, textAlign: 'center', background: 'var(--neutral-0)', margin: '0 16px', borderRadius: 'var(--radius-lg)' }}>
+            Товары не найдены. Убедитесь, что база данных Supabase заполнена и настроены ключи доступа.
+          </div>
         </Section>
       )}
 

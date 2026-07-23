@@ -19,7 +19,8 @@ export default function CatalogPage() {
   useEffect(() => {
     async function load() {
       setLoading(true)
-      const { data: cats } = await supabase.from('categories').select('*').order('sort_order')
+      const { data: cats, error: catErr } = await supabase.from('categories').select('*')
+      if (catErr) console.error('Catalog categories fetch error:', catErr)
       setCategories((cats as Category[]) ?? [])
 
       if (q) {
